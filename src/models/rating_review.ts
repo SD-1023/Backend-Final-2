@@ -2,7 +2,7 @@ import {  DataTypes } from 'sequelize';
 import { sequelize } from '../app';
 
 
-export const Rating_ReviewModel = sequelize.define('reviews', {
+export const Ratings_ReviewsModel = sequelize.define('reviews', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,

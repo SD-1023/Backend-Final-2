@@ -17,7 +17,7 @@ export const productValidator = Joi.object({
 
 
 // Define the Joi schema based on the AddressModel structure
-export const addressSchema = Joi.object({
+export const addresssSchema = Joi.object({
   street: Joi.string().max(128).required(),
   city: Joi.string().max(64).required(),
   state: Joi.string().max(64).required(),
@@ -29,7 +29,7 @@ export const addressSchema = Joi.object({
 
 
 // Define the Joi schema based on the CartModel structure
-export const cartSchema = Joi.object({
+export const cartsSchema = Joi.object({
   user_id: Joi.number().integer().required(),
   status: Joi.string().valid('active', 'completed', 'abandoned').required(),
   // Add any other fields you want to validate here
@@ -38,7 +38,7 @@ export const cartSchema = Joi.object({
 
 
 // Define the Joi schema based on the OrderModel structure
-export const orderSchema = Joi.object({
+export const ordersSchema = Joi.object({
   user_id: Joi.number().integer().required(),
   total: Joi.number().precision(2).required(), // Ensure this aligns with your DECIMAL(10, 2) definition
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
@@ -46,7 +46,7 @@ export const orderSchema = Joi.object({
 });
 
 // Define the Joi schema based on the Rating_ReviewModel structure
-export const ratingReviewSchema = Joi.object({
+export const ratingReviewsSchema = Joi.object({
     user_id: Joi.number().integer().required(),
     product_id: Joi.number().integer().required(),
     rating: Joi.number().integer().min(1).max(5).required(),
@@ -55,7 +55,7 @@ export const ratingReviewSchema = Joi.object({
   });
 
 // Define the Joi schema based on the UserModel structure
-export const userSchema = Joi.object({
+export const usersSchema = Joi.object({
     username: Joi.string().alphanum().min(3).max(50).required(),
     email: Joi.string().email({ tlds: { allow: false } }).required(),
     password: Joi.string().min(6).max(100).required(),

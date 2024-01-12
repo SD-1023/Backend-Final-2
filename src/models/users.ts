@@ -2,7 +2,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 import { sequelize } from '../app';
 
 
-export const UserModel = sequelize.define('users', {
+export const UsersModel = sequelize.define('users', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
