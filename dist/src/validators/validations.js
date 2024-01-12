@@ -17,4 +17,5 @@ exports.productValidator = joi_1.default.object({
     newArrivals: joi_1.default.boolean().default(false),
     discount: joi_1.default.boolean().default(false),
     quantity: joi_1.default.number().min(0).default(1),
+    product_image: joi_1.default.string().base64(),
 });

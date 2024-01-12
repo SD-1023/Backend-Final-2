@@ -1,8 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import productsRoutes from "./routes/products"
+import bodyParser from "body-parser";
 import { ProductsModel } from "./models/products";
-import { fillTables } from "./utils/fakter";
+import { fillTables } from "./utils/faker";
 
 const app = express();
 dotenv.config();
@@ -10,7 +11,7 @@ dotenv.config();
 
 app.use(express.json());
 
-app.use("/products",productsRoutes)
+app.use("/products",productsRoutes);
 
 
 // * Only uncomment this to create a table in your database
