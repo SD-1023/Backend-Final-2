@@ -3,8 +3,9 @@ import dotenv from "dotenv";
 import { DataTypes, Sequelize } from "sequelize";
 
 import productsRoutes from "./routes/products"
+
 import { ProductsModel } from "./models/products";
-import { fillTables } from "./utils/fakter";
+import { fillTables } from "./utils/faker";
 
 const app = express();
 dotenv.config();
@@ -24,7 +25,7 @@ export const sequelize = new Sequelize(
 
 app.use(express.json());
 
-app.use("/products",productsRoutes)
+app.use("/products",productsRoutes);
 
 
 // * Only uncomment this to create a table in your database

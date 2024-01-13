@@ -13,6 +13,7 @@ export const productValidator = Joi.object({
     newArrivals:Joi.boolean().default(false),
     discount:Joi.boolean().default(false),
     quantity:Joi.number().min(0).default(1),
+    product_image:Joi.string().base64(),
 })
 
 
@@ -61,14 +62,3 @@ export const usersSchema = Joi.object({
     password: Joi.string().min(6).max(100).required(),
     // Add any other fields you want to validate here
   });
-
-
-
-
-
-
-
-
-
-
-

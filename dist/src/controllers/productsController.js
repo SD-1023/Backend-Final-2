@@ -26,18 +26,58 @@ cloudinary_1.v2.config({
     secure: true,
 });
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10; // In this project it will be 9
+    var _a;
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 9;
+    if (page < 0) {
+        page = 1;
+    }
+    if (limit > 80 || limit < 0) {
+        limit = 9;
+    }
+    const search = (_a = req.query.search) === null || _a === void 0 ? void 0 : _a.toString();
+    let conditions = {};
+    if (search) {
+        conditions.name = {
+            [sequelize_1.Op.like]: `%${req.query.search}%`,
+        };
+    }
+    let greaterThan;
+    if (!Number.isNaN(req.query["gte"])) {
+        greaterThan = Number(req.query["gte"]);
+    }
+    let lessThan;
+    if (!Number.isNaN(req.query["lte"])) {
+        lessThan = Number(req.query["lte"]);
+    }
+    if (greaterThan) {
+        conditions = Object.assign(Object.assign({}, conditions), { price: {
+                [sequelize_1.Op.gte]: greaterThan,
+            } });
+    }
+    if (lessThan) {
+        conditions = Object.assign(Object.assign({}, conditions), { price: Object.assign(Object.assign({}, conditions["price"]), { [sequelize_1.Op.lte]: lessThan }) });
+    }
+    let sort = req.query.sort;
+    if (sort &&
+        (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")) {
+        let dir;
+        sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
+        sort = [[`${sort.replace("-", "")}`, dir]];
+    }
+    else {
+        sort = [["id", "ASC"]];
+    }
     const products = yield products_1.ProductsModel.findAll({
-        where: {
-            id: {
-                [sequelize_1.Op.gte]: page * limit - limit + 1,
-            },
-        },
-        order: [["id", "ASC"]],
+        where: conditions,
+        order: sort,
         limit: Number(limit),
+        offset: (page - 1) * limit,
     });
-    return res.status(200).json({ data: { message: "success", products } });
+    const count = yield products_1.ProductsModel.count({ where: conditions });
+    return res
+        .status(200)
+        .json({ data: { message: "success", count, page, limit, products } });
 });
 exports.getAllProducts = getAllProducts;
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -56,14 +96,15 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     if (error) {
         return res.status(400).json({ error });
     }
-    const imagePath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApgAAAKYB3X3/OAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJtZZPbBtFFMZ/M7ubXdtdb1xSFyeilBapySVU8h8OoFaooFSqiihIVIpQBKci6KEg9Q6H9kovIHoCIVQJJCKE1ENFjnAgcaSGC6rEnxBwA04Tx43t2FnvDAfjkNibxgHxnWb2e/u992bee7tCa00YFsffekFY+nUzFtjW0LrvjRXrCDIAaPLlW0nHL0SsZtVoaF98mLrx3pdhOqLtYPHChahZcYYO7KvPFxvRl5XPp1sN3adWiD1ZAqD6XYK1b/dvE5IWryTt2udLFedwc1+9kLp+vbbpoDh+6TklxBeAi9TL0taeWpdmZzQDry0AcO+jQ12RyohqqoYoo8RDwJrU+qXkjWtfi8Xxt58BdQuwQs9qC/afLwCw8tnQbqYAPsgxE1S6F3EAIXux2oQFKm0ihMsOF71dHYx+f3NND68ghCu1YIoePPQN1pGRABkJ6Bus96CutRZMydTl+TvuiRW1m3n0eDl0vRPcEysqdXn+jsQPsrHMquGeXEaY4Yk4wxWcY5V/9scqOMOVUFthatyTy8QyqwZ+kDURKoMWxNKr2EeqVKcTNOajqKoBgOE28U4tdQl5p5bwCw7BWquaZSzAPlwjlithJtp3pTImSqQRrb2Z8PHGigD4RZuNX6JYj6wj7O4TFLbCO/Mn/m8R+h6rYSUb3ekokRY6f/YukArN979jcW+V/S8g0eT/N3VN3kTqWbQ428m9/8k0P/1aIhF36PccEl6EhOcAUCrXKZXXWS3XKd2vc/TRBG9O5ELC17MmWubD2nKhUKZa26Ba2+D3P+4/MNCFwg59oWVeYhkzgN/JDR8deKBoD7Y+ljEjGZ0sosXVTvbc6RHirr2reNy1OXd6pJsQ+gqjk8VWFYmHrwBzW/n+uMPFiRwHB2I7ih8ciHFxIkd/3Omk5tCDV1t+2nNu5sxxpDFNx+huNhVT3/zMDz8usXC3ddaHBj1GHj/As08fwTS7Kt1HBTmyN29vdwAw+/wbwLVOJ3uAD1wi/dUH7Qei66PfyuRj4Ik9is+hglfbkbfR3cnZm7chlUWLdwmprtCohX4HUtlOcQjLYCu+fzGJH2QRKvP3UNz8bWk1qMxjGTOMThZ3kvgLI5AzFfo379UAAAAASUVORK5CYII=";
-    // * Both image path and base64 works
+    const image = `data:image/png;base64,${validatedNewProduct.product_image}`;
     let image_secureUrl;
     try {
         yield cloudinary_1.v2.uploader
-            .upload(imagePath, {
+            .upload(image, {
             folder: process.env.PRODUCTS_IMAGES_FOLDER_PATH,
+            use_filename: true,
             resource_type: "image",
+            transformation: [{ width: 200, height: 200, crop: "fit" }],
         })
             .then((result) => {
             console.log(result);
@@ -75,6 +116,8 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(500).json({ error });
     }
     validatedNewProduct.image_secure_url = image_secureUrl;
+    validatedNewProduct.product_image = undefined;
+    // removing base64 from returned response
     const insertNewProductToDB = yield products_1.ProductsModel.create({
         name: validatedNewProduct.name,
         category: validatedNewProduct.category,
