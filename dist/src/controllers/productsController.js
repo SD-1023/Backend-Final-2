@@ -26,18 +26,58 @@ cloudinary_1.v2.config({
     secure: true,
 });
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10; // In this project it will be 9
+    var _a;
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 9;
+    if (page < 0) {
+        page = 1;
+    }
+    if (limit > 80 || limit < 0) {
+        limit = 9;
+    }
+    const search = (_a = req.query.search) === null || _a === void 0 ? void 0 : _a.toString();
+    let conditions = {};
+    if (search) {
+        conditions.name = {
+            [sequelize_1.Op.like]: `%${req.query.search}%`,
+        };
+    }
+    let greaterThan;
+    if (!Number.isNaN(req.query["gte"])) {
+        greaterThan = Number(req.query["gte"]);
+    }
+    let lessThan;
+    if (!Number.isNaN(req.query["lte"])) {
+        lessThan = Number(req.query["lte"]);
+    }
+    if (greaterThan) {
+        conditions = Object.assign(Object.assign({}, conditions), { price: {
+                [sequelize_1.Op.gte]: greaterThan,
+            } });
+    }
+    if (lessThan) {
+        conditions = Object.assign(Object.assign({}, conditions), { price: Object.assign(Object.assign({}, conditions["price"]), { [sequelize_1.Op.lte]: lessThan }) });
+    }
+    let sort = req.query.sort;
+    if (sort &&
+        (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")) {
+        let dir;
+        sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
+        sort = [[`${sort.replace("-", "")}`, dir]];
+    }
+    else {
+        sort = [["id", "ASC"]];
+    }
     const products = yield products_1.ProductsModel.findAll({
-        where: {
-            id: {
-                [sequelize_1.Op.gte]: page * limit - limit + 1,
-            },
-        },
-        order: [["id", "ASC"]],
+        where: conditions,
+        order: sort,
         limit: Number(limit),
+        offset: (page - 1) * limit,
     });
-    return res.status(200).json({ data: { message: "success", products } });
+    const count = yield products_1.ProductsModel.count({ where: conditions });
+    return res
+        .status(200)
+        .json({ data: { message: "success", count, page, limit, products } });
 });
 exports.getAllProducts = getAllProducts;
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

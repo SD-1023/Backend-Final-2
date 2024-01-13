@@ -15,20 +15,77 @@ cloudinary.config({
 });
 
 export const getAllProducts = async (req: Request, res: Response) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10; // In this project it will be 9
+  let page = Number(req.query.page) || 1;
+  let limit = Number(req.query.limit) || 9;
+
+  if (page < 0) {
+    page = 1;
+  }
+  if (limit > 80 || limit < 0) {
+    limit = 9;
+  }
+
+  const search = req.query.search?.toString();
+  let conditions: any = {};
+
+  if (search) {
+    conditions.name = {
+      [Op.like]: `%${req.query.search}%`,
+    };
+  }
+
+  let greaterThan;
+  if (!Number.isNaN(req.query["gte"])) {
+    greaterThan = Number(req.query["gte"]);
+  }
+
+  let lessThan;
+  if (!Number.isNaN(req.query["lte"])) {
+    lessThan = Number(req.query["lte"]);
+  }
+
+  if (greaterThan) {
+    conditions = {
+      ...conditions,
+      price: {
+        [Op.gte]: greaterThan,
+      },
+    };
+  }
+
+  if (lessThan) {
+    conditions = {
+      ...conditions,
+      price: {
+        ...conditions["price"],
+        [Op.lte]: lessThan,
+      },
+    };
+  }
+
+  let sort: any = req.query.sort;
+  if (
+    sort &&
+    (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
+  ) {
+    let dir;
+    sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
+    sort = [[`${sort.replace("-", "")}`, dir]];
+  } else {
+    sort = [["id", "ASC"]];
+  }
 
   const products = await ProductsModel.findAll({
-    where: {
-      id: {
-        [Op.gte]: page * limit - limit + 1,
-      },
-    },
-    order: [["id", "ASC"]],
+    where: conditions,
+    order: sort,
     limit: Number(limit),
+    offset: (page - 1) * limit,
   });
 
-  return res.status(200).json({ data: { message: "success", products } });
+  const count = await ProductsModel.count({ where: conditions });
+  return res
+    .status(200)
+    .json({ data: { message: "success", count, page, limit, products } });
 };
 
 export const getProductById = async (req: Request, res: Response) => {

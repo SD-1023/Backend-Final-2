@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import productsRoutes from "./routes/products"
-import bodyParser from "body-parser";
+
 import { ProductsModel } from "./models/products";
 import { fillTables } from "./utils/faker";
 
