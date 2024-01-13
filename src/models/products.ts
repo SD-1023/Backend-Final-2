@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { DataTypes, Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
@@ -13,6 +14,13 @@ export const sequelize = new Sequelize(
     port: Number(process.env.DB_PORT),
   }
 );
+=======
+import { DataTypes } from "sequelize";
+import dotenv from "dotenv";
+import { sequelize } from "../app";
+dotenv.config();
+
+>>>>>>> a552aa9021ca4dadb4698a9c27f49db6934fe328
 
 export const ProductsModel = sequelize.define("products", {
   id: {
