@@ -3,16 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductsModel = exports.sequelize = void 0;
+exports.ProductsModel = void 0;
 const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
+const fileSystem_1 = require("../config/fileSystem");
+const database_1 = require("../config/database");
 dotenv_1.default.config();
-exports.sequelize = new sequelize_1.Sequelize("eCommerceTap", process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-    host: process.env.DB_HOSTNAME,
-    dialect: process.env.DB_DIALECT,
-    port: Number(process.env.DB_PORT),
-});
-exports.ProductsModel = exports.sequelize.define("products", {
+(0, fileSystem_1.applyFileSysyem)();
+// Connects to the fileSystem to enable storing images
+exports.ProductsModel = database_1.sequelize.define("products", {
     id: {
         type: sequelize_1.DataTypes.INTEGER,
         autoIncrement: true,

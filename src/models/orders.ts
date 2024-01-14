@@ -1,5 +1,5 @@
 import {DataTypes } from 'sequelize';
-import { sequelize } from '../app';
+import { sequelize } from "../config/database";
 
 
 export const OrdersModel = sequelize.define('orders', {

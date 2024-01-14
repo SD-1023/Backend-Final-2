@@ -7,13 +7,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-  secure: true,
-});
-
 export const getAllProducts = async (req: Request, res: Response) => {
   let page = Number(req.query.page) || 1;
   let limit = Number(req.query.limit) || 9;

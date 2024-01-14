@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from "../app";
+import { sequelize } from "../config/database";
 export const AddressModel = sequelize.define('addresses', {
     id: {
       type: DataTypes.INTEGER,
