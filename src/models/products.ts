@@ -1,8 +1,11 @@
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
-import { sequelize } from "../app";
+import { applyFileSysyem } from "../config/fileSystem";
+import { sequelize } from "../config/database";
 dotenv.config();
 
+applyFileSysyem();
+// Connects to the fileSystem to enable storing images
 
 export const ProductsModel = sequelize.define("products", {
   id: {
@@ -58,7 +61,3 @@ export const ProductsModel = sequelize.define("products", {
   //     defaultValue:[]
   // }
 });
-
-// ProductsModel.sync({ alter: true }).then((fullfuiiled) => {
-//   console.log(fullfuiiled, "fullfilled");
-// });
