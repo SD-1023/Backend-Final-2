@@ -16,40 +16,42 @@ dotenv.config();
 app.use(express.json());
 app.use("/products",productsRoutes);
 app.use("/reviews",reviewsRoutes);
-app.use("/categories",categoriesRoutes)
+app.use("/categories",categoriesRoutes);
 
 
-// * Only uncomment this to create a table in your database
-// const fillingTables = async ()=>{
+
+
+// // * Only uncomment this to create a table in your database
+// const fillingProductsTables = async ()=>{
 //     await ProductsModel.sync({force:true});
 //     await fillTables();
     
 // }
-// fillingTables()
+// fillingProductsTables()
 
-//* Only uncomment this to create a table in your database
-// const fillingTables = async ()=>{
+// //* Only uncomment this to create a table in your database
+// const fillingReviewsTables = async ()=>{
 //     await ReviewsModel.sync({force:true});
 //     await fillTablesReviews();
     
 // }
-// fillingTables()
+// fillingReviewsTables()
 
-// *==================
+// //*==================
 // const fillingTablesCategories = async () =>{
 //     await CategoriesModel.sync({force:true});
 //     await fillTablesCategories();
 // }
 // fillingTablesCategories()
 
-// *==================
+// //*==================
 // const fillingTablesUsers_ =async() =>{
 //     await UsersModel.sync({force:true});
 //     await fillingTablesUsers();
 // }
 // fillingTablesUsers_()
 
-// *===================
+// //*===================
 // const fillingTablesOrders_ = async () =>{
 //     await OrdersModel.sync({force :true});
 //     await fillingTablesOrders();

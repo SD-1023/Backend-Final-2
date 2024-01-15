@@ -13,14 +13,14 @@ const generateRandomData = () => {
     description: faker.commerce.productDescription(),
     quantity: faker.number.int({ min: 0, max: 10 }),
     discount: true,
-    finalPrice: faker.commerce.price({ max: 150 }),
+    finalPrice: faker.commerce.price({min:0, max: 150 }),
     category: faker.commerce.productMaterial(),
   });
 
   const randomReviews = () => ({
     user_id: faker.number.int({ min: 1, max: 150 }),
     rating: faker.number.float({ min: 1, max: 5 }),
-    comment: faker.lorem.words({ min: 5, max: 15 }),
+    comment: faker.lorem.words({ min: 5, max: 12 }),
     product_id: faker.number.int({ min: 1, max: 150 }),
   });
 
