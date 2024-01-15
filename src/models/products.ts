@@ -1,26 +1,8 @@
-<<<<<<< HEAD
-import { DataTypes, Sequelize } from "sequelize";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-export const sequelize = new Sequelize(
-  "eCommerceTap",
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOSTNAME,
-    dialect: process.env.DB_DIALECT,
-    port: Number(process.env.DB_PORT),
-  }
-);
-=======
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../app";
 dotenv.config();
-
->>>>>>> a552aa9021ca4dadb4698a9c27f49db6934fe328
 
 export const ProductsModel = sequelize.define("products", {
   id: {
