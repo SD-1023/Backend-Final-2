@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { sequelize } from "../config/database";
 
 
@@ -22,7 +22,8 @@ export const UsersModel = sequelize.define('users', {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
-  // Additional fields 
-}, {
-  // Sequelize model options go here
+  user_image: {
+    type:DataTypes.STRING(40),
+    allowNull:true
+  }
 });

@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
 import { ProductsModel } from "../models/products";
 import { Op } from "sequelize";
-import { idValidator, productValidator } from "../validators/validations";
+import { productValidator } from "../validators/validations";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
+import { applyFileSysyem } from "../config/fileSystem";
+import { ReviewsModel } from "../models/reviews";
+import { sequelize } from "../config/database";
 
 dotenv.config();
+
+applyFileSysyem();
 
 export const getAllProducts = async (req: Request, res: Response) => {
   let page = Number(req.query.page) || 1;
@@ -68,8 +73,36 @@ export const getAllProducts = async (req: Request, res: Response) => {
     sort = [["id", "ASC"]];
   }
 
+  const category = req.query.category as unknown as String;
+
+  if (
+    category &&
+    (category == "Steel" ||
+      category == "Watches" ||
+      category == "Skincare" ||
+      category == "Handbags" ||
+      category == "Sun Glasses")
+  ) {
+    conditions = {
+      ...conditions,
+      category: category,
+    };
+  }
+
   const products = await ProductsModel.findAll({
     where: conditions,
+    attributes:{
+      include: [
+          [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
+          [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
+      ]
+    },
+    include:[{
+      model:ReviewsModel,
+      attributes:[]
+    }],
+    group: ['products.id'],
+    subQuery:false,
     order: sort,
     limit: Number(limit),
     offset: (page - 1) * limit,
@@ -83,14 +116,21 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
 export const getProductById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { error } = idValidator.validate({ id });
 
-  if (error) {
-    return res.status(400).json({ validationError: error.message });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
+  }
+  
+  let product = await ProductsModel.findByPk(id,{
+    include:[ReviewsModel],
+  });
+
+  let [[{ avgRate }]] : any = await sequelize.query(`SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`)
+  if(Number.isNaN(avgRate)){
+    avgRate =0;
   }
 
-  const product = await ProductsModel.findByPk(id);
-  return res.status(200).json({ product });
+  return res.status(200).json({ data: { message: "success", product : {...product?.dataValues ,averageRating: Number(avgRate)}, } });
 };
 
 export const createProduct = async (req: Request, res: Response) => {
@@ -142,7 +182,7 @@ export const createProduct = async (req: Request, res: Response) => {
       product: validatedNewProduct,
     },
   });
-};
+}
 
 export const updateProduct = async (req: Request, res: Response) => {
   const newProduct = req.body;
@@ -154,9 +194,8 @@ export const updateProduct = async (req: Request, res: Response) => {
     return res.status(400).json({ errorProduct });
   }
 
-  const { error: idError } = idValidator.validate({ id });
-  if (idError) {
-    return res.status(400).json({ idError });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
   }
 
   const updateNewProductInDB = await ProductsModel.update(
@@ -185,9 +224,8 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
-  const { error: idError } = idValidator.validate({ id });
-  if (idError) {
-    return res.status(400).json({ idError });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
   }
 
   const deleteProduct = await ProductsModel.destroy({

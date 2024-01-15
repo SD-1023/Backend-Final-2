@@ -23,7 +23,8 @@ exports.UsersModel = database_1.sequelize.define('users', {
         type: sequelize_1.DataTypes.STRING(100),
         allowNull: false,
     },
-    // Additional fields 
-}, {
-// Sequelize model options go here
+    user_image: {
+        type: sequelize_1.DataTypes.STRING(40),
+        allowNull: true
+    }
 });

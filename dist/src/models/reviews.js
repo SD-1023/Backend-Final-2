@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReviewsModel = void 0;
 const sequelize_1 = require("sequelize");
 const database_1 = require("../config/database");
+const products_1 = require("./products");
 exports.ReviewsModel = database_1.sequelize.define('reviews', {
     id: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -12,32 +13,19 @@ exports.ReviewsModel = database_1.sequelize.define('reviews', {
     user_id: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: 'users',
-            key: 'id', // The column in the users table that this foreign key references
-        }
     },
     product_id: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: 'products',
-            key: 'id', // The column in the products table that this foreign key references
-        }
     },
     rating: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-            min: 1, // Assuming a rating scale of 1 to 5
-            max: 5
-        }
     },
     comment: {
         type: sequelize_1.DataTypes.TEXT,
-        allowNull: true, // Allowing for the possibility of a rating without a comment
+        allowNull: true,
     },
-    // Any other fields 
-}, {
-// Sequelize model options go here
 });
+exports.ReviewsModel.hasOne(products_1.ProductsModel, { foreignKey: "id" });
+products_1.ProductsModel.hasMany(exports.ReviewsModel, { foreignKey: "product_id" });

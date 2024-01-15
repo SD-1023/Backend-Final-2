@@ -61,7 +61,3 @@ export const ProductsModel = sequelize.define("products", {
   //     defaultValue:[]
   // }
 });
-
-// ProductsModel.sync({ alter: true }).then((fullfuiiled) => {
-//   console.log(fullfuiiled, "fullfilled");
-// });

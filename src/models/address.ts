@@ -29,12 +29,5 @@ export const AddressModel = sequelize.define('addresses', {
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'users', 
-        key: 'id', // This is the column name of the referenced model
-      }
     },
-    // Add any other fields or configurations here
-  }, {
-    // Sequelize options here
   });

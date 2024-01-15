@@ -12,21 +12,34 @@ exports.OrdersModel = database_1.sequelize.define('orders', {
     user_id: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: 'users', // This should match the table name for users
-            key: 'id', // This is the column name of the referenced model
-        }
     },
-    total: {
-        type: sequelize_1.DataTypes.DECIMAL(10, 2),
+    product_id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false
+    },
+    discount: {
+        type: sequelize_1.DataTypes.DECIMAL(6, 2),
+        allowNull: false,
+    },
+    deliveryFee: {
+        type: sequelize_1.DataTypes.DECIMAL(6, 2),
+        allowNull: false,
+    },
+    subTotal: {
+        type: sequelize_1.DataTypes.DECIMAL(6, 2),
         allowNull: false,
     },
     status: {
         type: sequelize_1.DataTypes.STRING(20),
         allowNull: false,
-        defaultValue: 'pending', // Example statuses: 'pending', 'completed', 'cancelled'
+        defaultValue: 'pending', // Example statuses: 'pending', 'delivered', 'cancelled'
     },
-    // Additional fields 
-}, {
-// Sequelize model options go here
+    rating: {
+        type: sequelize_1.DataTypes.DECIMAL(6, 2),
+        allowNull: false,
+    },
+    grandTotal: {
+        type: sequelize_1.DataTypes.DECIMAL(6, 2),
+        allowNull: false,
+    } // subTotal - discount - delivery fee
 });

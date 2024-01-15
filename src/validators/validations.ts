@@ -1,9 +1,5 @@
 import Joi from "joi";
 
-export const idValidator = Joi.object({
-    id:Joi.number().required(),
-})
-
 export const productValidator = Joi.object({
     name:Joi.string().min(4).max(40).required(),
     price:Joi.number().min(0).required(),

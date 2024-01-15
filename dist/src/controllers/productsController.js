@@ -18,7 +18,11 @@ const sequelize_1 = require("sequelize");
 const validations_1 = require("../validators/validations");
 const cloudinary_1 = require("cloudinary");
 const dotenv_1 = __importDefault(require("dotenv"));
+const fileSystem_1 = require("../config/fileSystem");
+const reviews_1 = require("../models/reviews");
+const database_1 = require("../config/database");
 dotenv_1.default.config();
+(0, fileSystem_1.applyFileSysyem)();
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     let page = Number(req.query.page) || 1;
@@ -62,8 +66,29 @@ const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function*
     else {
         sort = [["id", "ASC"]];
     }
+    const category = req.query.category;
+    if (category &&
+        (category == "Steel" ||
+            category == "Watches" ||
+            category == "Skincare" ||
+            category == "Handbags" ||
+            category == "Sun Glasses")) {
+        conditions = Object.assign(Object.assign({}, conditions), { category: category });
+    }
     const products = yield products_1.ProductsModel.findAll({
         where: conditions,
+        attributes: {
+            include: [
+                [database_1.sequelize.fn("AVG", database_1.sequelize.col('rating')), "averageStars"],
+                [database_1.sequelize.fn("COUNT", database_1.sequelize.col('rating')), "ratingNumbers"]
+            ]
+        },
+        include: [{
+                model: reviews_1.ReviewsModel,
+                attributes: []
+            }],
+        group: ['products.id'],
+        subQuery: false,
         order: sort,
         limit: Number(limit),
         offset: (page - 1) * limit,
@@ -76,12 +101,17 @@ const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.getAllProducts = getAllProducts;
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = Number(req.params.id);
-    const { error } = validations_1.idValidator.validate({ id });
-    if (error) {
-        return res.status(400).json({ validationError: error.message });
+    if (Number.isNaN(id)) {
+        return res.sendStatus(400);
     }
-    const product = yield products_1.ProductsModel.findByPk(id);
-    return res.status(200).json({ product });
+    let product = yield products_1.ProductsModel.findByPk(id, {
+        include: [reviews_1.ReviewsModel],
+    });
+    let [[{ avgRate }]] = yield database_1.sequelize.query(`SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`);
+    if (Number.isNaN(avgRate)) {
+        avgRate = 0;
+    }
+    return res.status(200).json({ data: { message: "success", product: Object.assign(Object.assign({}, product === null || product === void 0 ? void 0 : product.dataValues), { averageRating: Number(avgRate) }), } });
 });
 exports.getProductById = getProductById;
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -138,9 +168,8 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     if (errorProduct) {
         return res.status(400).json({ errorProduct });
     }
-    const { error: idError } = validations_1.idValidator.validate({ id });
-    if (idError) {
-        return res.status(400).json({ idError });
+    if (Number.isNaN(id)) {
+        return res.sendStatus(400);
     }
     const updateNewProductInDB = yield products_1.ProductsModel.update({
         name: validatedNewProduct.name,
@@ -163,9 +192,8 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.updateProduct = updateProduct;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = Number(req.params.id);
-    const { error: idError } = validations_1.idValidator.validate({ id });
-    if (idError) {
-        return res.status(400).json({ idError });
+    if (Number.isNaN(id)) {
+        return res.sendStatus(400);
     }
     const deleteProduct = yield products_1.ProductsModel.destroy({
         where: {
