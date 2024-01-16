@@ -1,3 +1,4 @@
+import { WishlistsModel } from './../models/wishlist';
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -47,12 +48,18 @@ const generateRandomData = () => {
     
   });
 
+  const randomWishLists = ()=>({
+    user_id:faker.number.int({min:1,max:50}),
+    product_id:faker.number.int({min:1,max:75}),
+  })
+
   return {
     randomProducts,
     randomReviews,
     randomCategories,
     randomUsers,
     randomOrders,
+    randomWishLists
   };
 };
 
@@ -107,3 +114,13 @@ export const fillingTablesOrders = async () => {
     console.log(`ITERATION ==========> ${i} <================`);
   }
 };
+
+export const filingTablesWishLists = async()=>{
+  const { randomWishLists } = generateRandomData();
+
+  for(let i =0;i<100;i++){
+    const randomWishList = randomWishLists();
+    await WishlistsModel.create(randomWishList);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+}
