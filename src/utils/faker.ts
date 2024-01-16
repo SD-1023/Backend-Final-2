@@ -1,3 +1,4 @@
+import { WishlistsModel } from './../models/wishlist';
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -13,14 +14,14 @@ const generateRandomData = () => {
     description: faker.commerce.productDescription(),
     quantity: faker.number.int({ min: 0, max: 10 }),
     discount: true,
-    finalPrice: faker.commerce.price({ max: 150 }),
+    finalPrice: faker.commerce.price({min:0, max: 150 }),
     category: faker.commerce.productMaterial(),
   });
 
   const randomReviews = () => ({
     user_id: faker.number.int({ min: 1, max: 150 }),
     rating: faker.number.float({ min: 1, max: 5 }),
-    comment: faker.lorem.words({ min: 5, max: 15 }),
+    comment: faker.lorem.words({ min: 5, max: 12 }),
     product_id: faker.number.int({ min: 1, max: 150 }),
   });
 
@@ -47,12 +48,18 @@ const generateRandomData = () => {
     
   });
 
+  const randomWishLists = ()=>({
+    user_id:faker.number.int({min:1,max:50}),
+    product_id:faker.number.int({min:1,max:75}),
+  })
+
   return {
     randomProducts,
     randomReviews,
     randomCategories,
     randomUsers,
     randomOrders,
+    randomWishLists
   };
 };
 
@@ -107,3 +114,13 @@ export const fillingTablesOrders = async () => {
     console.log(`ITERATION ==========> ${i} <================`);
   }
 };
+
+export const filingTablesWishLists = async()=>{
+  const { randomWishLists } = generateRandomData();
+
+  for(let i =0;i<100;i++){
+    const randomWishList = randomWishLists();
+    await WishlistsModel.create(randomWishList);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+}

@@ -4,13 +4,13 @@ import { Op } from "sequelize";
 import { productValidator } from "../validators/validations";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
-import { applyFileSysyem } from "../config/fileSystem";
+import { applyFileSystem } from "../config/fileSystem";
 import { ReviewsModel } from "../models/reviews";
 import { sequelize } from "../config/database";
 
 dotenv.config();
 
-applyFileSysyem();
+applyFileSystem();
 
 export const getAllProducts = async (req: Request, res: Response) => {
   let page = Number(req.query.page) || 1;

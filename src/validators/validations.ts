@@ -58,3 +58,8 @@ export const usersSchema = Joi.object({
     password: Joi.string().min(6).max(100).required(),
     // Add any other fields you want to validate here
   });
+
+export const wishListSchema = Joi.object({
+  productId:Joi.number().integer().positive().required(),
+  userId:Joi.number().integer().positive().required(),
+})
