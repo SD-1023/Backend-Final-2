@@ -10,7 +10,6 @@ export const productValidator = Joi.object({
     newArrivals:Joi.boolean().default(false),
     discount:Joi.boolean().default(false),
     quantity:Joi.number().min(0).default(1),
-    product_image:Joi.string().base64(),
 })
 
 

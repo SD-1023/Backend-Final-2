@@ -163,9 +163,6 @@ export const fillingTablesAddresses = async()=>{
 
   for(let i =0; i< 100; i++){
     const randomAddress = randomAddresses();
-    if(randomAddress.country == "Israel"){
-      randomAddress.country = "Palestine";
-    }
     await AddressModel.create(randomAddress);
     console.log(`ITERATION ==========> ${i} <================`);
   }

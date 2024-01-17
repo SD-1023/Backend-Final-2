@@ -2,14 +2,13 @@ import { Request, Response } from "express";
 import { ProductsModel } from "../models/products";
 import { Op } from "sequelize";
 import { productValidator } from "../validators/validations";
-import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 import { applyFileSystem } from "../config/fileSystem";
 import { ReviewsModel } from "../models/reviews";
 import { sequelize } from "../config/database";
+import cloudinary from "../config/fileSystem";
 
 dotenv.config();
-
 applyFileSystem();
 
 export const getAllProducts = async (req: Request, res: Response) => {
@@ -91,18 +90,18 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
   const products = await ProductsModel.findAll({
     where: conditions,
-    attributes:{
+    attributes: {
       include: [
-          [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
-          [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
-      ]
+        // [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
+        // [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
+      ],
     },
-    include:[{
-      model:ReviewsModel,
-      attributes:[]
-    }],
-    group: ['products.id'],
-    subQuery:false,
+    // include:[{
+    //   model:ReviewsModel,
+    //   attributes:[]
+    // }],
+    group: ["products.id"],
+    subQuery: false,
     order: sort,
     limit: Number(limit),
     offset: (page - 1) * limit,
@@ -120,74 +119,74 @@ export const getProductById = async (req: Request, res: Response) => {
   if (Number.isNaN(id)) {
     return res.sendStatus(400);
   }
-  
-  let product = await ProductsModel.findByPk(id,{
-    include:[ReviewsModel],
+
+  let product = await ProductsModel.findByPk(id, {
+    include: [ReviewsModel],
   });
 
-  let [[{ avgRate }]] : any = await sequelize.query(`SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`)
-  if(Number.isNaN(avgRate)){
-    avgRate =0;
+  let [[{ avgRate }]]: any = await sequelize.query(
+    `SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`
+  );
+  if (Number.isNaN(avgRate)) {
+    avgRate = 0;
   }
 
-  return res.status(200).json({ data: { message: "success", product : {...product?.dataValues ,averageRating: Number(avgRate)}, } });
+  return res
+    .status(200)
+    .json({
+      data: {
+        message: "success",
+        product: { ...product?.dataValues, averageRating: Number(avgRate) },
+      },
+    });
 };
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response) => { 
+  try{
   const newProduct = req.body;
   const { error, value: validatedNewProduct } =
     productValidator.validate(newProduct);
   if (error) {
     return res.status(400).json({ error });
   }
-  console.log(validatedNewProduct)
-  console.log("validatedNewProduct <============================================================================")
-  const image = `data:image/png;base64,${validatedNewProduct.product_image}`;
-  let image_secureUrl;
-  try {
-    await cloudinary.uploader
-      .upload(image, {
-        folder: process.env.PRODUCTS_IMAGES_FOLDER_PATH,
-        use_filename: true,
-        resource_type: "image",
-        transformation: [{ width: 200, height: 200, crop: "fit" }],
-      })
-      .then((result) => {
-        console.log(result);
-        image_secureUrl = result.secure_url;
-      });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error });
-  }
-console.log(validatedNewProduct)
-  validatedNewProduct.image_secure_url = image_secureUrl;
-  validatedNewProduct.product_image = undefined;
-  // removing base64 from returned response
+    const imageFile = req.files;
+    if(imageFile?.length == 0){
+      return res.status(400).json({error:"missing image"})
+    }
+    const [{ buffer,originalname }]: any = imageFile;
+    let base64Image = buffer.toString('base64');
 
-  try{
-  const insertNewProductToDB = await ProductsModel.create({
-    name: validatedNewProduct.name,
-    category: validatedNewProduct.category,
-    price: validatedNewProduct.price,
-    description: validatedNewProduct.description,
-    finalPrice: validatedNewProduct.finalPrice,
-    Category__Id:validatedNewProduct.categoryId,
-    newArrivals: validatedNewProduct.newArrivals,
-    discount: validatedNewProduct.discount,
-    quantity: validatedNewProduct.quantity,
-    image_secure_url: validatedNewProduct.image_secure_url,
-  });
-}catch(error){
-  console.log(error)
-  return res.status(222).send(error)
-}
-  return res.status(201).json({
-    data: {
-      message: "success",
-      product: validatedNewProduct,
-    },
-  });
+    let UploadedImage = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
+      use_filename: true,
+      resource_type:"image",
+      folder:process.env.PRODUCTS_IMAGES_FOLDER_PATH,
+      transformation:[{width:1200,height:1200,crop:"fit"}]
+    }).then((result)=>{
+      const insertNewProductToDB = ProductsModel.create({
+        name: validatedNewProduct.name,
+        category: validatedNewProduct.category,
+        price: validatedNewProduct.price,
+        description: validatedNewProduct.description,
+        finalPrice: validatedNewProduct.finalPrice,
+        Category__Id: validatedNewProduct.categoryId,
+        newArrivals: validatedNewProduct.newArrivals,
+        discount: validatedNewProduct.discount,
+        quantity: validatedNewProduct.quantity,
+        image_secure_url: result.secure_url,
+      }).then(()=>{
+        validatedNewProduct.image_secure_url = result.secure_url;
+        return res.status(201).json({
+          data: {
+            message: "success",
+            product: validatedNewProduct,
+          },
+        });
+      });
+    })
+  }catch(error){
+    console.log(error)
+    return res.status(500).json({error})
+  }
 }
 
 export const updateProduct = async (req: Request, res: Response) => {

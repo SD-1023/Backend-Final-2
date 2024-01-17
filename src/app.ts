@@ -17,7 +17,7 @@ import { CategoriesModel } from "./models/categories";
 import { UsersModel } from "./models/users";
 import { OrdersModel } from "./models/orders";
 import { CartsModel } from './models/cart';
-import cors from "cors"
+import cors from "cors";
 
 const app = express();
 dotenv.config();
@@ -25,6 +25,7 @@ dotenv.config();
 
 app.use(cors())
 app.use(express.json());
+
 app.use("/products",productsRoutes);
 app.use("/reviews",reviewsRoutes);
 app.use("/categories",categoriesRoutes);
