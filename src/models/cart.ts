@@ -1,28 +1,25 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../app';
+import { sequelize } from "../config/database";
 
 
-export const CartsModel = sequelize.define('carts', {
+export const CartsModel = sequelize.define('cart', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
+  product_name: {
+    type:DataTypes.STRING(40),
+    allowNull:false,
+  },
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'users', // This should match the table name for users
-      key: 'id', // The column in the users table that this foreign key references
-    }
   },
-  status: {
-    type: DataTypes.STRING(20),
-    allowNull: false,
-    defaultValue: 'active', // Possible values might be 'active', 'completed', 'abandoned'
+  quantity :{
+    type:DataTypes.INTEGER,
+    allowNull:false
   },
-  //add additional 
-}, {
-      // Sequelize model options go here
-
+},{
+  freezeTableName:true,
 });

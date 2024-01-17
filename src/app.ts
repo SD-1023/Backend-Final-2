@@ -1,43 +1,81 @@
 import express from "express";
 import dotenv from "dotenv";
-import { DataTypes, Sequelize } from "sequelize";
 import productsRoutes from "./routes/products";
+import reviewsRoutes from "./routes/reviews";
+import categoriesRoutes from "./routes/categories";
 import { ProductsModel } from "./models/products";
-import { fillTables } from "./utils/faker";
+import { ReviewsModel } from "./models/reviews";
+import {
+  fillTables,
+  fillTablesCategories,
+  fillTablesReviews,
+  fillingTablesOrders,
+  fillingTablesUsers,
+} from "./utils/faker";
+import { CategoriesModel } from "./models/categories";
+import { UsersModel } from "./models/users";
+import { OrdersModel } from "./models/orders";
+import { sequelize } from "./config/database";
 
 const app = express();
 dotenv.config();
 
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log(
+      "Connection to the database has been established successfully."
+    );
+  })
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
+  });
+
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("Database synced");
+  })
+  .catch((err) => {
+    console.log("Error syncing the database", err);
+  });
+
+const fillingReviewsTables = async () => {
+  await ReviewsModel.sync({ force: true });
+  await fillTablesReviews();
+};
+fillingReviewsTables();
+
+const fillingTablesCategories = async () => {
+  await CategoriesModel.sync({ force: true });
+  await fillTablesCategories();
+};
+fillingTablesCategories();
+
+const fillingTablesUsers_ = async () => {
+  await UsersModel.sync({ force: true });
+  await fillingTablesUsers();
+};
+fillingTablesUsers_();
+
+const fillingTablesOrders_ = async () => {
+  await OrdersModel.sync({ force: true });
+  await fillingTablesOrders();
+};
+fillingTablesOrders_();
+
+// const filingTablesWishLists_ = async () => {
+//   await WishlistsModel.sync({ force: true });
+//   await filingTablesWishLists();
+// };
+// filingTablesWishLists_();
+
 app.use(express.json());
+app.use("/products", productsRoutes);
+app.use("/reviews", reviewsRoutes);
+app.use("/categories", categoriesRoutes);
 
-app.use("/products",productsRoutes)
-
-export const sequelize = new Sequelize(
-    "eCommerceTap",
-    process.env.DB_USERNAME as string,
-    process.env.DB_PASSWORD,
-    {
-      host: process.env.DB_HOSTNAME,
-      dialect: process.env.DB_DIALECT as 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql',
-      port: Number(process.env.DB_PORT),
-    }
-  );
-  
-
-
-app.use(express.json());
-
-app.use("/products",productsRoutes);
-
-
-// * Only uncomment this to create a table in your database
-// const fillingTables = async ()=>{
-//     await ProductsModel.sync({force:true});
-//     await fillTables();
-    
-// }
-// fillingTables()
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT , ()=> console.log(`Server is running in development mode on PORT : ${PORT}`));
-
+const PORT = process.env.PORT;
+app.listen(PORT, () =>
+  console.log(`Server is running in development mode on PORT : ${PORT}`)
+);
