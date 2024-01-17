@@ -1,6 +1,8 @@
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
+import { CategoriesModel } from "./categories";
+
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -20,6 +22,10 @@ export const ProductsModel = sequelize.define("products", {
   category: {
     type: DataTypes.STRING(40),
     allowNull: false,
+  },
+  Category__Id :{
+    type:DataTypes.INTEGER(),
+    allowNull:false,
   },
   description: {
     type: DataTypes.STRING(256),
@@ -57,3 +63,6 @@ export const ProductsModel = sequelize.define("products", {
   //     defaultValue:[]
   // }
 });
+
+// CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
+// ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory" });
