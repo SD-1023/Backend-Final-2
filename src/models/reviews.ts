@@ -27,5 +27,5 @@ export const ReviewsModel = sequelize.define('reviews', {
   },
 });
 
-ReviewsModel.hasOne(ProductsModel,{foreignKey:"id"});
-ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"})
+// ReviewsModel.belongsTo(ProductsModel,{foreignKey:"id"});
+// ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"})

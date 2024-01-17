@@ -140,7 +140,8 @@ export const createProduct = async (req: Request, res: Response) => {
   if (error) {
     return res.status(400).json({ error });
   }
-
+  console.log(validatedNewProduct)
+  console.log("validatedNewProduct <============================================================================")
   const image = `data:image/png;base64,${validatedNewProduct.product_image}`;
   let image_secureUrl;
   try {
@@ -159,23 +160,28 @@ export const createProduct = async (req: Request, res: Response) => {
     console.log(error);
     return res.status(500).json({ error });
   }
-
+console.log(validatedNewProduct)
   validatedNewProduct.image_secure_url = image_secureUrl;
   validatedNewProduct.product_image = undefined;
   // removing base64 from returned response
 
+  try{
   const insertNewProductToDB = await ProductsModel.create({
     name: validatedNewProduct.name,
     category: validatedNewProduct.category,
     price: validatedNewProduct.price,
     description: validatedNewProduct.description,
     finalPrice: validatedNewProduct.finalPrice,
+    Category__Id:validatedNewProduct.categoryId,
     newArrivals: validatedNewProduct.newArrivals,
     discount: validatedNewProduct.discount,
     quantity: validatedNewProduct.quantity,
     image_secure_url: validatedNewProduct.image_secure_url,
   });
-
+}catch(error){
+  console.log(error)
+  return res.status(222).send(error)
+}
   return res.status(201).json({
     data: {
       message: "success",
