@@ -1,66 +1,182 @@
 import { Request, Response } from "express";
 import { ProductsModel } from "../models/products";
 import { Op } from "sequelize";
-import { idValidator, productValidator } from "../validators/validations";
+import { productValidator } from "../validators/validations";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
+import { applyFileSystem } from "../config/fileSystem";
+import { ReviewsModel } from "../models/reviews";
+import { sequelize } from "../config/database";
 
 dotenv.config();
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-  secure: true,
-});
+applyFileSystem();
 
 export const getAllProducts = async (req: Request, res: Response) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10; // In this project it will be 9
+  let page = Number(req.query.page) || 1;
+  let limit = Number(req.query.limit) || 9;
+
+  if (page < 0) {
+    page = 1;
+  }
+  if (limit > 80 || limit < 0) {
+    limit = 9;
+  }
+
+  const search = req.query.search?.toString();
+  let conditions: any = {};
+
+  if (search) {
+    conditions.name = {
+      [Op.like]: `%${req.query.search}%`,
+    };
+  }
+
+  let greaterThan;
+  if (!Number.isNaN(req.query["gte"])) {
+    greaterThan = Number(req.query["gte"]);
+  }
+
+  let lessThan;
+  if (!Number.isNaN(req.query["lte"])) {
+    lessThan = Number(req.query["lte"]);
+  }
+
+  if (greaterThan) {
+    conditions = {
+      ...conditions,
+      price: {
+        [Op.gte]: greaterThan,
+      },
+    };
+  }
+
+  if (lessThan) {
+    conditions = {
+      ...conditions,
+      price: {
+        ...conditions["price"],
+        [Op.lte]: lessThan,
+      },
+    };
+  }
+
+  let sort: any = req.query.sort;
+  if (
+    sort &&
+    (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
+  ) {
+    let dir;
+    sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
+    sort = [[`${sort.replace("-", "")}`, dir]];
+  } else {
+    sort = [["id", "ASC"]];
+  }
+
+  const category = req.query.category as unknown as String;
+
+  if (
+    category &&
+    (category == "Steel" ||
+      category == "Watches" ||
+      category == "Skincare" ||
+      category == "Handbags" ||
+      category == "Sun Glasses")
+  ) {
+    conditions = {
+      ...conditions,
+      category: category,
+    };
+  }
 
   const products = await ProductsModel.findAll({
-    where: {
-      id: {
-        [Op.gte]: page * limit - limit + 1,
-      },
+    where: conditions,
+    attributes: {
+      include: [
+        [sequelize.fn("AVG", sequelize.col("rating")), "averageStars"],
+        [sequelize.fn("COUNT", sequelize.col("rating")), "ratingNumbers"],
+      ],
     },
-    order: [["id", "ASC"]],
+    include: [
+      {
+        model: ReviewsModel,
+        attributes: [],
+      },
+    ],
+    group: ["products.id"],
+    subQuery: false,
+    order: sort,
     limit: Number(limit),
+    offset: (page - 1) * limit,
   });
 
-  return res.status(200).json({ data: { message: "success", products } });
+  const count = await ProductsModel.count({ where: conditions });
+  return res
+    .status(200)
+    .json({ data: { message: "success", count, page, limit, products } });
+};
+
+export const getNewArrivals = async (req: Request, res: Response) => {
+  try {
+    const latestProducts = await ProductsModel.findAll({
+      order: [["createdAt", "DESC"]],
+      limit: 4,
+    });
+
+    return res
+      .status(200)
+      .json({ data: { message: "success", latestProducts } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 export const getProductById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { error } = idValidator.validate({ id });
 
-  if (error) {
-    return res.status(400).json({ validationError: error.message });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
   }
 
-  const product = await ProductsModel.findByPk(id);
-  return res.status(200).json({ product });
+  let product = await ProductsModel.findByPk(id, {
+    include: [ReviewsModel],
+  });
+
+  let [[{ avgRate }]]: any = await sequelize.query(
+    `SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`
+  );
+  if (Number.isNaN(avgRate)) {
+    avgRate = 0;
+  }
+
+  return res
+    .status(200)
+    .json({
+      data: {
+        message: "success",
+        product: { ...product?.dataValues, averageRating: Number(avgRate) },
+      },
+    });
 };
 
 export const createProduct = async (req: Request, res: Response) => {
   const newProduct = req.body;
-
   const { error, value: validatedNewProduct } =
     productValidator.validate(newProduct);
   if (error) {
     return res.status(400).json({ error });
   }
 
-   const imagePath = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApgAAAKYB3X3/OAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJtZZPbBtFFMZ/M7ubXdtdb1xSFyeilBapySVU8h8OoFaooFSqiihIVIpQBKci6KEg9Q6H9kovIHoCIVQJJCKE1ENFjnAgcaSGC6rEnxBwA04Tx43t2FnvDAfjkNibxgHxnWb2e/u992bee7tCa00YFsffekFY+nUzFtjW0LrvjRXrCDIAaPLlW0nHL0SsZtVoaF98mLrx3pdhOqLtYPHChahZcYYO7KvPFxvRl5XPp1sN3adWiD1ZAqD6XYK1b/dvE5IWryTt2udLFedwc1+9kLp+vbbpoDh+6TklxBeAi9TL0taeWpdmZzQDry0AcO+jQ12RyohqqoYoo8RDwJrU+qXkjWtfi8Xxt58BdQuwQs9qC/afLwCw8tnQbqYAPsgxE1S6F3EAIXux2oQFKm0ihMsOF71dHYx+f3NND68ghCu1YIoePPQN1pGRABkJ6Bus96CutRZMydTl+TvuiRW1m3n0eDl0vRPcEysqdXn+jsQPsrHMquGeXEaY4Yk4wxWcY5V/9scqOMOVUFthatyTy8QyqwZ+kDURKoMWxNKr2EeqVKcTNOajqKoBgOE28U4tdQl5p5bwCw7BWquaZSzAPlwjlithJtp3pTImSqQRrb2Z8PHGigD4RZuNX6JYj6wj7O4TFLbCO/Mn/m8R+h6rYSUb3ekokRY6f/YukArN979jcW+V/S8g0eT/N3VN3kTqWbQ428m9/8k0P/1aIhF36PccEl6EhOcAUCrXKZXXWS3XKd2vc/TRBG9O5ELC17MmWubD2nKhUKZa26Ba2+D3P+4/MNCFwg59oWVeYhkzgN/JDR8deKBoD7Y+ljEjGZ0sosXVTvbc6RHirr2reNy1OXd6pJsQ+gqjk8VWFYmHrwBzW/n+uMPFiRwHB2I7ih8ciHFxIkd/3Omk5tCDV1t+2nNu5sxxpDFNx+huNhVT3/zMDz8usXC3ddaHBj1GHj/As08fwTS7Kt1HBTmyN29vdwAw+/wbwLVOJ3uAD1wi/dUH7Qei66PfyuRj4Ik9is+hglfbkbfR3cnZm7chlUWLdwmprtCohX4HUtlOcQjLYCu+fzGJH2QRKvP3UNz8bWk1qMxjGTOMThZ3kvgLI5AzFfo379UAAAAASUVORK5CYII="
-   // * Both image path and base64 works
-
+  const image = `data:image/png;base64,${validatedNewProduct.product_image}`;
   let image_secureUrl;
   try {
     await cloudinary.uploader
-      .upload(imagePath, {
+      .upload(image, {
         folder: process.env.PRODUCTS_IMAGES_FOLDER_PATH,
+        use_filename: true,
         resource_type: "image",
+        transformation: [{ width: 200, height: 200, crop: "fit" }],
       })
       .then((result) => {
         console.log(result);
@@ -72,6 +188,8 @@ export const createProduct = async (req: Request, res: Response) => {
   }
 
   validatedNewProduct.image_secure_url = image_secureUrl;
+  validatedNewProduct.product_image = undefined;
+  // removing base64 from returned response
 
   const insertNewProductToDB = await ProductsModel.create({
     name: validatedNewProduct.name,
@@ -103,9 +221,8 @@ export const updateProduct = async (req: Request, res: Response) => {
     return res.status(400).json({ errorProduct });
   }
 
-  const { error: idError } = idValidator.validate({ id });
-  if (idError) {
-    return res.status(400).json({ idError });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
   }
 
   const updateNewProductInDB = await ProductsModel.update(
@@ -134,9 +251,8 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
 
-  const { error: idError } = idValidator.validate({ id });
-  if (idError) {
-    return res.status(400).json({ idError });
+  if (Number.isNaN(id)) {
+    return res.sendStatus(400);
   }
 
   const deleteProduct = await ProductsModel.destroy({

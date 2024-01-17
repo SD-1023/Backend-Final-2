@@ -1,18 +1,7 @@
-import { DataTypes, Sequelize } from "sequelize";
+import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
-
+import { sequelize } from "../config/database";
 dotenv.config();
-
-export const sequelize = new Sequelize(
-  "eCommerceTap",
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOSTNAME,
-    dialect: process.env.DB_DIALECT,
-    port: Number(process.env.DB_PORT),
-  }
-);
 
 export const ProductsModel = sequelize.define("products", {
   id: {
@@ -52,7 +41,7 @@ export const ProductsModel = sequelize.define("products", {
     allowNull: true,
     defaultValue: null,
   },
-  image_secure_url:{
+  image_secure_url: {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
@@ -68,7 +57,3 @@ export const ProductsModel = sequelize.define("products", {
   //     defaultValue:[]
   // }
 });
-
-// ProductsModel.sync({ alter: true }).then((fullfuiiled) => {
-//   console.log(fullfuiiled, "fullfilled");
-// });
