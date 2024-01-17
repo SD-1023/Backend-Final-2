@@ -1,9 +1,8 @@
-import {  DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
-import { ProductsModel } from './products';
+import { ProductsModel } from "./products";
 
-
-export const ReviewsModel = sequelize.define('reviews', {
+export const ReviewsModel = sequelize.define("reviews", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -22,10 +21,10 @@ export const ReviewsModel = sequelize.define('reviews', {
     allowNull: false,
   },
   comment: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING(126),
     allowNull: true,
   },
 });
 
-ReviewsModel.hasOne(ProductsModel,{foreignKey:"id"});
-ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"})
+ReviewsModel.hasOne(ProductsModel);
+ProductsModel.hasMany(ReviewsModel);

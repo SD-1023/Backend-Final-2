@@ -1,8 +1,13 @@
+import { WishlistsModel } from "./models/wishlist";
 import express from "express";
 import dotenv from "dotenv";
 import productsRoutes from "./routes/products";
 import reviewsRoutes from "./routes/reviews";
 import categoriesRoutes from "./routes/categories";
+import wishlistRoutes from "./routes/wishlists";
+import usersRoutes from "./routes/users";
+import cartRoutes from "./routes/cart";
+import ordersRoutes from "./routes/orders";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
 import {
@@ -11,6 +16,7 @@ import {
   fillTablesReviews,
   fillingTablesOrders,
   fillingTablesUsers,
+  filingTablesWishLists,
 } from "./utils/faker";
 import { CategoriesModel } from "./models/categories";
 import { UsersModel } from "./models/users";
@@ -40,29 +46,35 @@ sequelize
     console.log("Error syncing the database", err);
   });
 
-const fillingReviewsTables = async () => {
-  await ReviewsModel.sync({ force: true });
-  await fillTablesReviews();
+const fillingTablesProduct_ = async () => {
+  await ProductsModel.sync({ force: false });
+  await fillTables();
 };
-fillingReviewsTables();
+fillingTablesProduct_();
 
-const fillingTablesCategories = async () => {
-  await CategoriesModel.sync({ force: true });
-  await fillTablesCategories();
-};
-fillingTablesCategories();
+// const fillingTablesOrders_ = async () => {
+//   await OrdersModel.sync({ force: true });
+//   await fillingTablesOrders();
+// };
+// fillingTablesOrders_();
 
-const fillingTablesUsers_ = async () => {
-  await UsersModel.sync({ force: true });
-  await fillingTablesUsers();
-};
-fillingTablesUsers_();
+// const fillingReviewsTables = async () => {
+//   await ReviewsModel.sync({ force: true });
+//   await fillTablesReviews();
+// };
+// fillingReviewsTables();
 
-const fillingTablesOrders_ = async () => {
-  await OrdersModel.sync({ force: true });
-  await fillingTablesOrders();
-};
-fillingTablesOrders_();
+// const fillingTablesCategories = async () => {
+//   await CategoriesModel.sync({ force: true });
+//   await fillTablesCategories();
+// };
+// fillingTablesCategories();
+
+// const fillingTablesUsers_ = async () => {
+//   await UsersModel.sync({ force: true });
+//   await fillingTablesUsers();
+// };
+// fillingTablesUsers_();
 
 // const filingTablesWishLists_ = async () => {
 //   await WishlistsModel.sync({ force: true });

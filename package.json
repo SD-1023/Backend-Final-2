@@ -2,7 +2,7 @@
   "name": "ecommercefinaltapg2",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "src/app.ts",
   "scripts": {
     "start": "nodemon ./dist/app.js"
   },

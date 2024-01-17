@@ -1,4 +1,3 @@
-import { sequelize } from './../config/database';
 import { Request, Response } from "express";
 import { ReviewsModel } from "../models/reviews";
 

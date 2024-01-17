@@ -53,10 +53,13 @@ export const ratingReviewsSchema = Joi.object({
 
 // Define the Joi schema based on the UserModel structure
 export const usersSchema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(50).required(),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required(),
-  password: Joi.string().min(6).max(100).required(),
-  // Add any other fields you want to validate here
-});
+    username: Joi.string().alphanum().min(3).max(50).required(),
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
+    password: Joi.string().min(6).max(100).required(),
+    // Add any other fields you want to validate here
+  });
+
+export const wishListSchema = Joi.object({
+  productId:Joi.number().integer().positive().required(),
+  userId:Joi.number().integer().positive().required(),
+})
