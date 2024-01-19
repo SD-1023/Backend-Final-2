@@ -25,6 +25,3 @@ export const ReviewsModel = sequelize.define("reviews", {
     allowNull: true,
   },
 });
-
-ReviewsModel.hasOne(ProductsModel);
-ProductsModel.hasMany(ReviewsModel);

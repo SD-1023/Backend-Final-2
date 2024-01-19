@@ -6,6 +6,15 @@ export const AddressModel = sequelize.define('addresses', {
       autoIncrement: true,
       primaryKey: true,
     },
+    Full__Name:{
+      type:DataTypes.STRING(64),
+    },
+    mobile_number:{
+      type:DataTypes.STRING(32),
+    },
+    country_calling_code:{
+      type:DataTypes.STRING(9),
+    },
     street: {
       type: DataTypes.STRING(128),
       allowNull: false,

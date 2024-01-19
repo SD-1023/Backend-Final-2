@@ -10,3 +10,5 @@ export const applyFileSystem = () => {
     secure: true,
   });
 };
+
+export default cloudinary;

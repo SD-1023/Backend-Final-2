@@ -1,3 +1,4 @@
+import { AddressModel } from "./models/address";
 import { WishlistsModel } from "./models/wishlist";
 import express from "express";
 import dotenv from "dotenv";
@@ -8,84 +9,56 @@ import wishlistRoutes from "./routes/wishlists";
 import usersRoutes from "./routes/users";
 import cartRoutes from "./routes/cart";
 import ordersRoutes from "./routes/orders";
+import addressesRoutes from "./routes/addresses";
+import productsThumbnailsRoutes from "./routes/productsThumbnailImages";
+import productsImagesRoutes from "./routes/productsImagesRoutes";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
-import {
-  fillTables,
-  fillTablesCategories,
-  fillTablesReviews,
-  fillingTablesOrders,
-  fillingTablesUsers,
-  filingTablesWishLists,
-} from "./utils/faker";
+
 import { CategoriesModel } from "./models/categories";
 import { UsersModel } from "./models/users";
 import { OrdersModel } from "./models/orders";
+import { CartsModel } from "./models/cart";
+import cors from "cors";
 import { sequelize } from "./config/database";
 
 const app = express();
 dotenv.config();
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log(
-      "Connection to the database has been established successfully."
-    );
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
-
-sequelize
-  .sync({ force: false })
-  .then(() => {
-    console.log("Database synced");
-  })
-  .catch((err) => {
-    console.log("Error syncing the database", err);
-  });
-
-const fillingTablesProduct_ = async () => {
-  await ProductsModel.sync({ force: false });
-  await fillTables();
-};
-fillingTablesProduct_();
-
-// const fillingTablesOrders_ = async () => {
-//   await OrdersModel.sync({ force: true });
-//   await fillingTablesOrders();
-// };
-// fillingTablesOrders_();
-
-// const fillingReviewsTables = async () => {
-//   await ReviewsModel.sync({ force: true });
-//   await fillTablesReviews();
-// };
-// fillingReviewsTables();
-
-// const fillingTablesCategories = async () => {
-//   await CategoriesModel.sync({ force: true });
-//   await fillTablesCategories();
-// };
-// fillingTablesCategories();
-
-// const fillingTablesUsers_ = async () => {
-//   await UsersModel.sync({ force: true });
-//   await fillingTablesUsers();
-// };
-// fillingTablesUsers_();
-
-// const filingTablesWishLists_ = async () => {
-//   await WishlistsModel.sync({ force: true });
-//   await filingTablesWishLists();
-// };
-// filingTablesWishLists_();
-
+app.use(cors());
 app.use(express.json());
+
+// sequelize
+//   .authenticate()
+//   .then(() => {
+//     console.log(
+//       "Connection to the database has been established successfully."
+//     );
+//   })
+//   .catch((err) => {
+//     console.error("Unable to connect to the database:", err);
+//   });
+
+// sequelize
+//   .sync({ force: true })
+//   .then(() => {
+//     console.log("Database synced");
+//   })
+//   .catch((err) => {
+//     console.log("Error syncing the database", err);
+//   });
+
 app.use("/products", productsRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/categories", categoriesRoutes);
+app.use("/wishlist", wishlistRoutes);
+app.use("/users", usersRoutes);
+app.use("/cart", cartRoutes);
+app.use("/orders", ordersRoutes);
+app.use("/addresses", addressesRoutes);
+app.use("/productsThumbnails", productsThumbnailsRoutes);
+app.use("/productsImages", productsImagesRoutes);
+
+// * Only uncomment this to create a table in your database
 
 const PORT = process.env.PORT;
 app.listen(PORT, () =>

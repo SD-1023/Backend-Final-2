@@ -4,17 +4,18 @@ export const productValidator = Joi.object({
   name: Joi.string().min(4).max(40).required(),
   price: Joi.number().min(0).required(),
   category: Joi.string().valid(
-    "Personal Care",
+    "Skincare",
     "Handbags",
-    "Wrist Watches",
-    "Sun Glasses"
+    "Jewellery",
+    "Watches",
+    "Eyewear"
   ),
+  categoryId: Joi.number().integer().positive().required(),
   description: Joi.string().min(5).max(256).required(),
   finalPrice: Joi.number().max(Joi.ref("price")).default(Joi.ref("price")),
   newArrivals: Joi.boolean().default(false),
   discount: Joi.boolean().default(false),
   quantity: Joi.number().min(0).default(1),
-  product_image: Joi.string().base64(),
 });
 
 // Define the Joi schema based on the AddressModel structure
@@ -53,13 +54,15 @@ export const ratingReviewsSchema = Joi.object({
 
 // Define the Joi schema based on the UserModel structure
 export const usersSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(50).required(),
-    email: Joi.string().email({ tlds: { allow: false } }).required(),
-    password: Joi.string().min(6).max(100).required(),
-    // Add any other fields you want to validate here
-  });
+  username: Joi.string().alphanum().min(3).max(50).required(),
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  password: Joi.string().min(6).max(100).required(),
+  // Add any other fields you want to validate here
+});
 
 export const wishListSchema = Joi.object({
-  productId:Joi.number().integer().positive().required(),
-  userId:Joi.number().integer().positive().required(),
-})
+  productId: Joi.number().integer().positive().required(),
+  userId: Joi.number().integer().positive().required(),
+});
