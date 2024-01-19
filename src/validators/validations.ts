@@ -3,7 +3,7 @@ import Joi from "joi";
 export const productValidator = Joi.object({
     name:Joi.string().min(4).max(40).required(),
     price:Joi.number().min(0).required(),
-    category:Joi.string().valid("Personal Care","Handbags","Wrist Watches","Sun Glasses"),
+    category:Joi.string().valid("Skincare","Handbags","Jewellery","Watches","Eyewear"),
     categoryId:Joi.number().integer().positive().required(),
     description:Joi.string().min(5).max(256).required(),
     finalPrice:Joi.number().max(Joi.ref('price')).default(Joi.ref('price')),
