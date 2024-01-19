@@ -4,6 +4,7 @@ import { ReviewsModel } from "../models/reviews";
 import { CategoriesModel } from "../models/categories";
 import { UsersModel } from "../models/users";
 import { OrdersModel } from "../models/orders";
+import { BrandsModel } from "../models/brands";
 
 const generateRandomData = () => {
   const randomProducts = () => ({
@@ -21,7 +22,7 @@ const generateRandomData = () => {
     user_id: faker.number.int({ min: 1, max: 150 }),
     rating: faker.number.float({ min: 1, max: 5 }),
     comment: faker.lorem.words({ min: 5, max: 15 }),
-    product_id: faker.number.int({ min: 1, max: 150 }),
+    product_id: faker.number.int({ min: 1, max: 100 }),
   });
 
   const randomCategories = () => ({
@@ -47,6 +48,7 @@ const generateRandomData = () => {
     
   });
 
+
   return {
     randomProducts,
     randomReviews,
@@ -56,6 +58,31 @@ const generateRandomData = () => {
   };
 };
 
+
+
+const realBrandNames = [
+  'Nike',
+  'Adidas',
+  'Apple',
+  'Samsung',
+  'Coca-Cola',
+  'Sony',
+  'Amazon',
+  'Google',
+  'Microsoft',
+  'BMW',
+  'Puma',
+];
+
+export const fillTablesBrands = async () => {
+  for (let i = 0; i < realBrandNames.length; i++) {
+    const brandName = realBrandNames[i];
+    await BrandsModel.create({ name: brandName });
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+
+  console.log(`Real Brands were created successfully`);
+};
 export const fillTables = async () => {
   const { randomProducts } = generateRandomData();
 

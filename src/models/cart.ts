@@ -8,7 +8,7 @@ export const CartsModel = sequelize.define('cart', {
     autoIncrement: true,
     primaryKey: true,
   },
-  product_name: {
+  product_name: { // should be id not name cuz its a FK 
     type:DataTypes.STRING(40),
     allowNull:false,
   },

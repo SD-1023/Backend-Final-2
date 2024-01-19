@@ -37,7 +37,7 @@ export const cartsSchema = Joi.object({
 // Define the Joi schema based on the OrderModel structure
 export const ordersSchema = Joi.object({
   user_id: Joi.number().integer().required(),
-  total: Joi.number().precision(2).required(), // Ensure this aligns with your DECIMAL(10, 2) definition
+  total: Joi.number().precision(2).required(), 
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
   // Add any other fields you want to validate here
 });
@@ -58,3 +58,11 @@ export const usersSchema = Joi.object({
     password: Joi.string().min(6).max(100).required(),
     // Add any other fields you want to validate here
   });
+
+  export const brandSchema = Joi.object({
+    name: Joi.string().min(3).max(40).required(),
+    image_secure_url: Joi.string().allow(null).max(128),
+    id: Joi.number().integer().required(),
+    // Add any other fields you want to validate here
+  });
+  

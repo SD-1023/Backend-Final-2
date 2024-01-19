@@ -12,107 +12,125 @@ dotenv.config();
 
 applyFileSysyem();
 
+
 export const getAllProducts = async (req: Request, res: Response) => {
-  let page = Number(req.query.page) || 1;
-  let limit = Number(req.query.limit) || 9;
+  try {
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 9;
 
-  if (page < 0) {
-    page = 1;
+    if (page < 0) {
+      page = 1;
+    }
+    if (limit > 80 || limit < 0) {
+      limit = 9;
+    }
+
+    const search = req.query.search?.toString();
+    let conditions: any = {};
+
+    if (search) {
+      conditions.name = {
+        [Op.like]: `%${req.query.search}%`,
+      };
+    }
+
+    let greaterThan;
+    if (!Number.isNaN(req.query['gte'])) {
+      greaterThan = Number(req.query['gte']);
+    }
+
+    let lessThan;
+    if (!Number.isNaN(req.query['lte'])) {
+      lessThan = Number(req.query['lte']);
+    }
+
+    if (greaterThan) {
+      conditions = {
+        ...conditions,
+        price: {
+          [Op.gte]: greaterThan,
+        },
+      };
+    }
+
+    if (lessThan) {
+      conditions = {
+        ...conditions,
+        price: {
+          ...conditions['price'],
+          [Op.lte]: lessThan,
+        },
+      };
+    }
+
+    let sort: any = req.query.sort;
+    if (
+      sort &&
+      (sort == '-name' || sort == 'name' || sort == 'price' || sort == '-price')
+    ) {
+      let dir;
+      sort.includes('-') ? (dir = 'DESC') : (dir = 'ASC');
+      sort = [[`${sort.replace('-', '')}`, dir]];
+    } else {
+      sort = [['id', 'ASC']];
+    }
+
+    const category = req.query.category as unknown as String;
+
+    if (
+      category &&
+      (category == 'Steel' ||
+        category == 'Watches' ||
+        category == 'Skincare' ||
+        category == 'Handbags' ||
+        category == 'Sun Glasses')
+    ) {
+      conditions = {
+        ...conditions,
+        category: category,
+      };
+    }
+
+    const products = await ProductsModel.findAll({
+      where: conditions,
+      attributes: [
+        'id',
+        'name',
+        'price',
+        'category',
+        'description',
+        'finalPrice',
+        'newArrivals',
+        'discount',
+        'quantity',
+        'image_name',
+        'image_secure_url',
+        'createdAt',
+        'updatedAt',
+        [sequelize.fn('AVG', sequelize.col('reviews.rating')), 'averageStars'],
+        [sequelize.fn('COUNT', sequelize.col('reviews.rating')), 'ratingNumbers'],
+      ],
+      include: [{
+        model: ReviewsModel,
+        attributes: [],
+      }],
+      group: ['products.id'],
+      subQuery: false,
+      order: sort,
+      limit: Number(limit),
+      offset: (page - 1) * limit,
+    });
+
+    const count = await ProductsModel.count({ where: conditions });
+
+    return res.status(200).json({ data: { message: 'success', count, page, limit, products } });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-  if (limit > 80 || limit < 0) {
-    limit = 9;
-  }
-
-  const search = req.query.search?.toString();
-  let conditions: any = {};
-
-  if (search) {
-    conditions.name = {
-      [Op.like]: `%${req.query.search}%`,
-    };
-  }
-
-  let greaterThan;
-  if (!Number.isNaN(req.query["gte"])) {
-    greaterThan = Number(req.query["gte"]);
-  }
-
-  let lessThan;
-  if (!Number.isNaN(req.query["lte"])) {
-    lessThan = Number(req.query["lte"]);
-  }
-
-  if (greaterThan) {
-    conditions = {
-      ...conditions,
-      price: {
-        [Op.gte]: greaterThan,
-      },
-    };
-  }
-
-  if (lessThan) {
-    conditions = {
-      ...conditions,
-      price: {
-        ...conditions["price"],
-        [Op.lte]: lessThan,
-      },
-    };
-  }
-
-  let sort: any = req.query.sort;
-  if (
-    sort &&
-    (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
-  ) {
-    let dir;
-    sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
-    sort = [[`${sort.replace("-", "")}`, dir]];
-  } else {
-    sort = [["id", "ASC"]];
-  }
-
-  const category = req.query.category as unknown as String;
-
-  if (
-    category &&
-    (category == "Steel" ||
-      category == "Watches" ||
-      category == "Skincare" ||
-      category == "Handbags" ||
-      category == "Sun Glasses")
-  ) {
-    conditions = {
-      ...conditions,
-      category: category,
-    };
-  }
-
-  const products = await ProductsModel.findAll({
-    where: conditions,
-    attributes:{
-      include: [
-          [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
-          [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
-      ]
-    },
-    include:[{
-      model:ReviewsModel,
-      attributes:[]
-    }],
-    group: ['products.id'],
-    subQuery:false,
-    order: sort,
-    limit: Number(limit),
-    offset: (page - 1) * limit,
-  });
-
-  const count = await ProductsModel.count({ where: conditions });
-  return res
-    .status(200)
-    .json({ data: { message: "success", count, page, limit, products } });
 };
+
+
 
 export const getProductById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
@@ -132,6 +150,9 @@ export const getProductById = async (req: Request, res: Response) => {
 
   return res.status(200).json({ data: { message: "success", product : {...product?.dataValues ,averageRating: Number(avgRate)}, } });
 };
+
+
+
 
 export const createProduct = async (req: Request, res: Response) => {
   const newProduct = req.body;
