@@ -1,3 +1,5 @@
+import { ProductsImagesModel } from './../models/productsImages';
+import { ProductsThumbnailImagesModel } from './../models/productsThumbnailsImages';
 import { Request, Response } from "express";
 import { ProductsModel } from "../models/products";
 import { Op } from "sequelize";
@@ -92,14 +94,14 @@ export const getAllProducts = async (req: Request, res: Response) => {
     where: conditions,
     attributes: {
       include: [
-        // [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
-        // [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
+        [sequelize.fn("AVG",sequelize.col('rating')), "averageStars"],
+        [sequelize.fn("COUNT",sequelize.col('rating')), "ratingNumbers"]
       ],
     },
-    // include:[{
-    //   model:ReviewsModel,
-    //   attributes:[]
-    // }],
+    include:[{
+      model:ReviewsModel,
+      attributes:[]
+    }],
     group: ["products.id"],
     subQuery: false,
     order: sort,
@@ -121,7 +123,17 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 
   let product = await ProductsModel.findByPk(id, {
-    include: [ReviewsModel],
+    include:[{
+      model:ReviewsModel,
+    },{
+      model:ProductsThumbnailImagesModel,
+      attributes:["id","image_thumbnail_url"]
+    },
+    {
+      model:ProductsImagesModel,
+      attributes:["id","image_url"]
+    }
+  ],
   });
 
   let [[{ avgRate }]]: any = await sequelize.query(
@@ -153,14 +165,14 @@ export const createProduct = async (req: Request, res: Response) => {
     if(imageFile?.length == 0){
       return res.status(400).json({error:"missing image"})
     }
-    const [{ buffer,originalname }]: any = imageFile;
+    const [{ buffer }]: any = imageFile;
     let base64Image = buffer.toString('base64');
 
     let UploadedImage = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
       use_filename: true,
       resource_type:"image",
       folder:process.env.PRODUCTS_IMAGES_FOLDER_PATH,
-      transformation:[{width:1200,height:1200,crop:"fit"}]
+      transformation:[{width:1400,height:1400,crop:"fit"}]
     }).then((result)=>{
       const insertNewProductToDB = ProductsModel.create({
         name: validatedNewProduct.name,

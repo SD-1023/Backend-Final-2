@@ -1,3 +1,6 @@
+import { ProductsImagesModel } from './productsImages';
+import { ProductsThumbnailImagesModel } from './productsThumbnailsImages';
+import { ReviewsModel } from './reviews';
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
@@ -64,5 +67,17 @@ export const ProductsModel = sequelize.define("products", {
   // }
 });
 
-// CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
-// ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory" });
+
+CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
+ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory"});
+ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"});
+ProductsModel.hasMany(ProductsThumbnailImagesModel,{foreignKey:"product_id"});
+ProductsModel.hasMany(ProductsImagesModel,{foreignKey:"product_id"});
+ProductsThumbnailImagesModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+ProductsImagesModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+ReviewsModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+
+
+// sequelize.sync({alter:true});
+
+
