@@ -12,6 +12,7 @@ import ordersRoutes from "./routes/orders";
 import addressesRoutes from "./routes/addresses";
 import productsThumbnailsRoutes from "./routes/productsThumbnailImages";
 import productsImagesRoutes from "./routes/productsImagesRoutes";
+import FakerRoute from "./routes/fakerRoutes";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
 
@@ -47,6 +48,7 @@ app.use(express.json());
 //     console.log("Error syncing the database", err);
 //   });
 
+app.use("/faker", FakerRoute);
 app.use("/products", productsRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/categories", categoriesRoutes);

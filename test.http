@@ -1,0 +1,5 @@
+### POST
+http://localhost:3000/faker/cat
+
+### POST Generate Products Route ###
+POST http://localhost:3000/faker/generate-reviews
