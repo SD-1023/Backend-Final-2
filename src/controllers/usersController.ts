@@ -30,7 +30,7 @@ export const getAllUsers = async (req:Request ,res: Response )=>{
             offset: (page - 1) * limit,
         });
 
-        return res.status(200).json({data : { message : "success" , users:allUsers}})
+        return res.status(200).json({message : "success" , users:allUsers})
     }catch(error){
         console.log(error)
         return res.sendStatus(500);
@@ -45,7 +45,7 @@ export const getUserById = async (req: Request,res: Response) =>{
         }
         const userProfile = await UsersModel.findByPk(id);
         
-        return res.status(200).json({data: { message:"success", user:userProfile}})
+        return res.status(200).json({message:"success", user:userProfile})
     }catch(error){
         console.log(error)
         return res.sendStatus(500);

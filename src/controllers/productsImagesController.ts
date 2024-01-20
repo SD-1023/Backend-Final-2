@@ -2,6 +2,26 @@ import { ProductsImagesModel } from './../models/productsImages';
 import { Request, Response } from "express";
 import cloudinary from "../config/fileSystem";
 
+
+export const getAllImagesById = async (req:Request ,res:Response) =>{
+    try{
+        const id = req.params.id;
+        if(Number.isNaN(id)){
+            return res.sendStatus(400);
+        }
+        const images = await ProductsImagesModel.findAll({
+            where:{
+                product_id:id,
+            }
+        });
+
+        return res.status(200).json({message:"success",productsImages:images})
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({error})
+    }
+}
+
 export const createProductImages = async (req :Request,res:Response)=>{
     try{
         const productId = req.body.productId;
@@ -35,11 +55,9 @@ export const createProductImages = async (req :Request,res:Response)=>{
                 }).then(()=>{
                     if(expectedLength == mainImages.length){
                         return res.status(201).json({
-                            data: {
                               message: "success",
                               productId,
                               productImages:mainImages,
-                            },
                         }); 
                     }
                 }).catch((error)=>{
@@ -48,6 +66,57 @@ export const createProductImages = async (req :Request,res:Response)=>{
                 })
             })
         }) 
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({error});
+    }
+}
+
+export const updateProductImage = async (req: Request,res:Response) =>{
+    try{
+        const id = req.params.id;
+        if(Number.isNaN(id)){
+            return res.sendStatus(400);
+        }
+        if(req.file == undefined){
+            return res.status(400).json({error:"missing image"});
+        }
+
+        if(!req.body.imageUrl){
+            return res.sendStatus(400);
+        }
+
+        const imageFile = req.file;
+            const { buffer } : any = imageFile;
+            let base64Image = buffer.toString('base64');
+
+            let url : string = req.body.imageUrl
+            let splitted = url.split("/");
+            let imgWithExt = splitted[splitted.length - 1]
+            let img = imgWithExt.split(".")[0]
+            console.log(img,"img")
+        let deletedImg = await cloudinary.api.delete_resources(
+            [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
+            { type: 'upload', resource_type: 'image' }
+        )
+        console.log(deletedImg);
+
+        let UploadedImage : any = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
+            use_filename: true,
+            resource_type:"image",
+            folder:process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH,
+            transformation:[{width:1400,height:1400,crop:"fit"}]
+          }).then(async(result)=>{
+            const updateImage : any = await ProductsImagesModel.update({
+                image_url:result.secure_url
+            },{
+                where:{
+                    id:id,
+                }
+            })
+        }).then(()=>{
+            return res.status(201).json({message:"success"})
+        })
     }catch(error){
         console.log(error);
         return res.status(500).json({error});
