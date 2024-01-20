@@ -14,7 +14,7 @@ export const getAllCategories = async (req:Request , res:Response) =>{
         });
         const returnedCount = categories.length;
 
-        return res.status(200).json({ data: { message:"success", count:returnedCount , categories } })
+        return res.status(200).json({message:"success", count:returnedCount , categories})
     }catch(error){
         console.log(error);
         return res.sendStatus(500);
@@ -44,7 +44,7 @@ export const getOneCategoryById = async (req:Request,res:Response) =>{
         })
         const count = category?.dataValues.products.length;
 
-        return res.status(200).json({ data: { message:"success",count, category } })
+        return res.status(200).json({message:"success",count, category })
     }catch(error){
         console.log(error);
         return res.sendStatus(500);

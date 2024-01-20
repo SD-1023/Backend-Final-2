@@ -17,7 +17,7 @@ export const getAllWishlistsByUserId = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ data: { message: "success", wishlist: userWishList } });
+      .json({message: "success", wishlist: userWishList });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -39,7 +39,7 @@ export const addToWishList = async (req: Request, res: Response) => {
     });
     return res
       .status(201)
-      .json({ data: { message: "success", WishList: AddNewWishList } });
+      .json({ message: "success", WishList: AddNewWishList });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
@@ -59,7 +59,7 @@ export const deleteFromWishList = async (req : Request,res : Response)=>{
             }
         });
         if(wishListItem){
-            return res.status(202).json({data : {message:"success"}})
+            return res.status(202).json({message:"success"})
         }
         if(!wishListItem){
             return res.sendStatus(204);
@@ -87,7 +87,7 @@ export const clearWishList = async (req :Request,res: Response)=>{
         })
 
         if(deletedWishList){
-            return res.status(202).json({data : {message:"success"}})
+            return res.status(202).json({message:"success"})
         }
         if(!deletedWishList){
             return res.sendStatus(204);
