@@ -22,10 +22,13 @@ export const ReviewsModel = sequelize.define('reviews', {
     allowNull: false,
   },
   comment: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING(126),
     allowNull: true,
   },
 });
 
-ReviewsModel.hasOne(ProductsModel,{foreignKey:"id"});
-ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"})
+// ReviewsModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+// ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"});
+
+// ReviewsModel.sync({alter:true});
+// ProductsModel.sync({alter:true});

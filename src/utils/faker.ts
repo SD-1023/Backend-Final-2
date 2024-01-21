@@ -1,3 +1,6 @@
+import { CartsModel } from './../models/cart';
+import { AddressModel } from './../models/address';
+import { WishlistsModel } from './../models/wishlist';
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -14,15 +17,16 @@ const generateRandomData = () => {
     description: faker.commerce.productDescription(),
     quantity: faker.number.int({ min: 0, max: 10 }),
     discount: true,
-    finalPrice: faker.commerce.price({ max: 150 }),
+    finalPrice: faker.commerce.price({min:0, max: 150 }),
     category: faker.commerce.productMaterial(),
+    Category__Id:faker.number.int({min:1,max:5}),
   });
 
   const randomReviews = () => ({
     user_id: faker.number.int({ min: 1, max: 150 }),
     rating: faker.number.float({ min: 1, max: 5 }),
     comment: faker.lorem.words({ min: 5, max: 15 }),
-    product_id: faker.number.int({ min: 1, max: 100 }),
+    product_id: faker.number.int({ min: 1, max: 150 }),
   });
 
   const randomCategories = () => ({
@@ -48,13 +52,15 @@ const generateRandomData = () => {
     
   });
 
-
   return {
     randomProducts,
     randomReviews,
     randomCategories,
     randomUsers,
     randomOrders,
+    randomWishLists,
+    randomAddresses,
+    randomCart
   };
 };
 
@@ -134,3 +140,32 @@ export const fillingTablesOrders = async () => {
     console.log(`ITERATION ==========> ${i} <================`);
   }
 };
+
+export const filingTablesWishLists = async()=>{
+  const { randomWishLists } = generateRandomData();
+
+  for(let i =0;i<100;i++){
+    const randomWishList = randomWishLists();
+    await WishlistsModel.create(randomWishList);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+}
+
+export const fillingTablesCart = async()=>{
+  const { randomCart } = generateRandomData();
+
+  for(let i = 0; i < 200 ; i++){
+    const randomCartItem = randomCart();
+    await CartsModel.create(randomCartItem);
+  }
+}
+
+export const fillingTablesAddresses = async()=>{
+  const { randomAddresses } = generateRandomData();
+
+  for(let i =0; i< 100; i++){
+    const randomAddress = randomAddresses();
+    await AddressModel.create(randomAddress);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+}

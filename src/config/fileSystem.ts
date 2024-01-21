@@ -2,8 +2,8 @@ import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 dotenv.config()
 
-export const applyFileSysyem = ()=>{
-    cloudinary.config({
+export const applyFileSystem = ()=>{
+   cloudinary.config({
         cloud_name: process.env.CLOUD_NAME,
         api_key: process.env.API_KEY,
         api_secret: process.env.API_SECRET,
@@ -11,3 +11,4 @@ export const applyFileSysyem = ()=>{
     });
 }
 
+export default cloudinary;

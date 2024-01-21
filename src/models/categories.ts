@@ -18,3 +18,4 @@ export const CategoriesModel = sequelize.define("categories",{
 },{
     timestamps:false
 })
+

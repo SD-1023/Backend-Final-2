@@ -1,4 +1,3 @@
-import { sequelize } from './../config/database';
 import { Request, Response } from "express";
 import { ReviewsModel } from "../models/reviews";
 
@@ -29,5 +28,5 @@ export const getAllReviewsById = async (req: Request, res: Response) => {
   const count = await ReviewsModel.count({ where: conditions });
   return res
     .status(200)
-    .json({ data: { message: "success", count, page, limit, reviews } });
+    .json({message: "success", count, page, limit, reviews });
 };

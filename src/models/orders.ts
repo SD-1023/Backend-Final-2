@@ -31,7 +31,7 @@ export const OrdersModel = sequelize.define('orders', {
   status: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    defaultValue: 'pending', // Example statuses: 'pending', 'delivered', 'cancelled'
+    defaultValue: 'pending',
   },
   rating: {
     type:DataTypes.DECIMAL(6,2),
