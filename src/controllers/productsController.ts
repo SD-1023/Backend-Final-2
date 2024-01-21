@@ -14,107 +14,111 @@ dotenv.config();
 applyFileSystem();
 
 export const getAllProducts = async (req: Request, res: Response) => {
-  let page = Number(req.query.page) || 1;
-  let limit = Number(req.query.limit) || 9;
+  try {
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 9;
 
-  if (page < 0) {
-    page = 1;
-  }
-  if (limit > 80 || limit < 0) {
-    limit = 9;
-  }
+    if (page < 0) {
+      page = 1;
+    }
+    if (limit > 80 || limit < 0) {
+      limit = 9;
+    }
 
-  const search = req.query.search?.toString();
-  let conditions: any = {};
+    const search = req.query.search?.toString();
+    let conditions: any = {};
 
-  if (search) {
-    conditions.name = {
-      [Op.like]: `%${req.query.search}%`,
-    };
-  }
+    if (search) {
+      conditions.name = {
+        [Op.like]: `%${req.query.search}%`,
+      };
+    }
 
-  let greaterThan;
-  if (!Number.isNaN(req.query["gte"])) {
-    greaterThan = Number(req.query["gte"]);
-  }
+    let greaterThan;
+    if (!Number.isNaN(req.query["gte"])) {
+      greaterThan = Number(req.query["gte"]);
+    }
 
-  let lessThan;
-  if (!Number.isNaN(req.query["lte"])) {
-    lessThan = Number(req.query["lte"]);
-  }
+    let lessThan;
+    if (!Number.isNaN(req.query["lte"])) {
+      lessThan = Number(req.query["lte"]);
+    }
 
-  if (greaterThan) {
-    conditions = {
-      ...conditions,
-      price: {
-        [Op.gte]: greaterThan,
+    if (greaterThan) {
+      conditions = {
+        ...conditions,
+        price: {
+          [Op.gte]: greaterThan,
+        },
+      };
+    }
+
+    if (lessThan) {
+      conditions = {
+        ...conditions,
+        price: {
+          ...conditions["price"],
+          [Op.lte]: lessThan,
+        },
+      };
+    }
+
+    let sort: any = req.query.sort;
+    if (
+      sort &&
+      (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
+    ) {
+      let dir;
+      sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
+      sort = [[`${sort.replace("-", "")}`, dir]];
+    } else {
+      sort = [["id", "ASC"]];
+    }
+
+    const category = req.query.category as unknown as String;
+
+    if (
+      category &&
+      (category == "Skincare" ||
+        category == "Watches" ||
+        category == "Jewellery" ||
+        category == "Handbags" ||
+        category == "Eyewear")
+    ) {
+      conditions = {
+        ...conditions,
+        category: category,
+      };
+    }
+
+    const products = await ProductsModel.findAll({
+      where: conditions,
+      attributes: {
+        include: [
+          [sequelize.fn("AVG", sequelize.col("rating")), "averageStars"],
+          [sequelize.fn("COUNT", sequelize.col("rating")), "ratingNumbers"],
+        ],
       },
-    };
-  }
-
-  if (lessThan) {
-    conditions = {
-      ...conditions,
-      price: {
-        ...conditions["price"],
-        [Op.lte]: lessThan,
-      },
-    };
-  }
-
-  let sort: any = req.query.sort;
-  if (
-    sort &&
-    (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
-  ) {
-    let dir;
-    sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
-    sort = [[`${sort.replace("-", "")}`, dir]];
-  } else {
-    sort = [["id", "ASC"]];
-  }
-
-  const category = req.query.category as unknown as String;
-
-  if (
-    category &&
-    (category == "Steel" ||
-      category == "Watches" ||
-      category == "Skincare" ||
-      category == "Handbags" ||
-      category == "Sun Glasses")
-  ) {
-    conditions = {
-      ...conditions,
-      category: category,
-    };
-  }
-
-  const products = await ProductsModel.findAll({
-    where: conditions,
-    attributes: {
       include: [
-        [sequelize.fn("AVG", sequelize.col("rating")), "averageStars"],
-        [sequelize.fn("COUNT", sequelize.col("rating")), "ratingNumbers"],
+        {
+          model: ReviewsModel,
+          attributes: [],
+        },
       ],
-    },
-    include: [
-      {
-        model: ReviewsModel,
-        attributes: [],
-      },
-    ],
-    group: ["products.id"],
-    subQuery: false,
-    order: sort,
-    limit: Number(limit),
-    offset: (page - 1) * limit,
-  });
+      group: ["products.id"],
+      subQuery: false,
+      order: sort,
+      limit: Number(limit),
+      offset: (page - 1) * limit,
+    });
 
-  const count = await ProductsModel.count({ where: conditions });
-  return res
-    .status(200)
-    .json({ data: { message: "success", count, page, limit, products } });
+    const count = await ProductsModel.count({ where: conditions });
+    return res
+      .status(200)
+      .json({ message: "success", count, page, limit, products });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 export const getNewArrivals = async (req: Request, res: Response) => {
@@ -134,41 +138,43 @@ export const getNewArrivals = async (req: Request, res: Response) => {
 };
 
 export const getProductById = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (Number.isNaN(id)) {
-    return res.sendStatus(400);
-  }
+    if (Number.isNaN(id)) {
+      return res.sendStatus(400);
+    }
 
-  let product = await ProductsModel.findByPk(id, {
-    include: [
-      {
-        model: ReviewsModel,
-      },
-      {
-        model: ProductsThumbnailImagesModel,
-        attributes: ["id", "image_thumbnail_url"],
-      },
-      {
-        model: ProductsImagesModel,
-        attributes: ["id", "image_url"],
-      },
-    ],
-  });
+    let product = await ProductsModel.findByPk(id, {
+      include: [
+        {
+          model: ReviewsModel,
+        },
+        {
+          model: ProductsThumbnailImagesModel,
+          attributes: ["id", "image_thumbnail_url"],
+        },
+        {
+          model: ProductsImagesModel,
+          attributes: ["id", "image_url"],
+        },
+      ],
+    });
 
-  let [[{ avgRate }]]: any = await sequelize.query(
-    `SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`
-  );
-  if (Number.isNaN(avgRate)) {
-    avgRate = 0;
-  }
+    let [[{ avgRate }]]: any = await sequelize.query(
+      `SELECT AVG(rating) as avgRate FROM reviews WHERE product_id = ${id}`
+    );
+    if (Number.isNaN(avgRate)) {
+      avgRate = 0;
+    }
 
-  return res.status(200).json({
-    data: {
+    return res.status(200).json({
       message: "success",
       product: { ...product?.dataValues, averageRating: Number(avgRate) },
-    },
-  });
+    });
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
 
 export const createProduct = async (req: Request, res: Response) => {
@@ -208,10 +214,8 @@ export const createProduct = async (req: Request, res: Response) => {
         }).then(() => {
           validatedNewProduct.image_secure_url = result.secure_url;
           return res.status(201).json({
-            data: {
-              message: "success",
-              product: validatedNewProduct,
-            },
+            message: "success",
+            product: validatedNewProduct,
           });
         });
       });
@@ -222,58 +226,67 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
-  const newProduct = req.body;
-  const id = Number(req.params.id);
+  try {
+    const newProduct = req.body;
+    const id = Number(req.params.id);
 
-  const { error: errorProduct, value: validatedNewProduct } =
-    productValidator.validate(newProduct);
-  if (errorProduct) {
-    return res.status(400).json({ errorProduct });
-  }
-
-  if (Number.isNaN(id)) {
-    return res.sendStatus(400);
-  }
-
-  const updateNewProductInDB = await ProductsModel.update(
-    {
-      name: validatedNewProduct.name,
-      category: validatedNewProduct.category,
-      price: validatedNewProduct.price,
-      description: validatedNewProduct.description,
-      finalPrice: validatedNewProduct.finalPrice,
-      newArrivals: validatedNewProduct.newArrivals,
-      discount: validatedNewProduct.discount,
-      quantity: validatedNewProduct.quantity,
-    },
-    {
-      where: {
-        id: id,
-      },
+    const { error: errorProduct, value: validatedNewProduct } =
+      productValidator.validate(newProduct);
+    if (errorProduct) {
+      return res.status(400).json({ errorProduct });
     }
-  );
 
-  return res.status(201).json({
-    data: { message: "success", newProduct: validatedNewProduct },
-  });
+    if (Number.isNaN(id)) {
+      return res.sendStatus(400);
+    }
+
+    const updateNewProductInDB = await ProductsModel.update(
+      {
+        name: validatedNewProduct.name,
+        category: validatedNewProduct.category,
+        price: validatedNewProduct.price,
+        description: validatedNewProduct.description,
+        finalPrice: validatedNewProduct.finalPrice,
+        newArrivals: validatedNewProduct.newArrivals,
+        discount: validatedNewProduct.discount,
+        quantity: validatedNewProduct.quantity,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+
+    return res.status(201).json({
+      message: "success",
+      newProduct: validatedNewProduct,
+    });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  try {
+    const id = Number(req.params.id);
 
-  if (Number.isNaN(id)) {
-    return res.sendStatus(400);
-  }
+    if (Number.isNaN(id)) {
+      return res.sendStatus(400);
+    }
 
-  const deleteProduct = await ProductsModel.destroy({
-    where: {
-      id: id,
-    },
-  });
+    const deleteProduct = await ProductsModel.destroy({
+      where: {
+        id: id,
+      },
+    });
 
-  if (deleteProduct) {
-    return res.status(202).json({ data: { message: "success" } });
-  } else {
-    return res.sendStatus(204);
+    if (deleteProduct) {
+      return res.status(202).json({ message: "success" });
+    } else {
+      return res.sendStatus(204);
+    }
+  } catch (error) {
+    return res.status(500).json({ error });
   }
 };

@@ -10,5 +10,8 @@ const upload = multer({
 } });
 const router = express.Router();
 
+router.get("/:id",productsThumbnailImagesController.getAllProductThumbnailImagesById);
 router.post("/",upload.any(),productsThumbnailImagesController.createProductThumbnailImages);
+router.put("/:id",upload.single("image"),productsThumbnailImagesController.updateProductThumbnailImage);
+
 export default router;
