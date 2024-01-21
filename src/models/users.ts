@@ -26,9 +26,7 @@ export const UsersModel = sequelize.define('users', {
     type:DataTypes.STRING(40),
     allowNull:true
   },
-  adress :{ // add it insted of the table I removed 
-    type:DataTypes.JSON,
-    allowNull:false,
-  }
+}, {
+  timestamps: false,
   
 });

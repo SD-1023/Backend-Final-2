@@ -7,7 +7,7 @@ export const getALLBrands = async (req:Request , res:Response) =>{
     try {
        
         const Brands = await BrandsModel.findAll();
-        return res.status(200).json({ data: { message:"success" , Brands} })
+        return res.status(200).json( Brands)
         
     } catch (error) {
         console.error(error);

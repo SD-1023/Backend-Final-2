@@ -52,6 +52,33 @@ const generateRandomData = () => {
     
   });
 
+  
+
+  const randomWishLists = ()=>({
+    user_id:faker.number.int({min:1,max:50}),
+    product_id:faker.number.int({min:1,max:75}),
+  })
+
+  const randomAddresses = ()=>({
+    street:faker.location.street(),
+    city:faker.location.city(),
+    country:faker.location.country(),
+    state:faker.location.state(),
+    postal_code:faker.finance.pin(),
+    country_calling_code:faker.location.countryCode('numeric'),
+    mobile_number:faker.phone.number(),
+    Full__Name:faker.person.fullName(),
+    user_id:faker.number.int({min:1,max:100}),
+  })
+
+  const randomCart = ()=>({
+    product_id:faker.number.int({min:1,max:100}),
+    product_name:faker.commerce.productName(),
+    user_id:faker.number.int({min:1,max:100}),
+    quantity:faker.number.int({min:1,max:10}),
+    product_price:faker.number.float({min:10,max:500,precision:2}),
+  })
+
   return {
     randomProducts,
     randomReviews,

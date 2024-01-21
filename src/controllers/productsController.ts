@@ -36,15 +36,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
     }
 
     let greaterThan;
-<<<<<<< HEAD
-    if (!Number.isNaN(req.query['gte'])) {
-      greaterThan = Number(req.query['gte']);
-    }
-
-    let lessThan;
-    if (!Number.isNaN(req.query['lte'])) {
-      lessThan = Number(req.query['lte']);
-=======
     if (!Number.isNaN(req.query["gte"])) {
       greaterThan = Number(req.query["gte"]);
     }
@@ -52,7 +43,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
     let lessThan;
     if (!Number.isNaN(req.query["lte"])) {
       lessThan = Number(req.query["lte"]);
->>>>>>> 51d2a88e810767ba8fb4d27a958563a8157017bd
     }
 
     if (greaterThan) {
@@ -68,11 +58,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       conditions = {
         ...conditions,
         price: {
-<<<<<<< HEAD
-          ...conditions['price'],
-=======
           ...conditions["price"],
->>>>>>> 51d2a88e810767ba8fb4d27a958563a8157017bd
           [Op.lte]: lessThan,
         },
       };
@@ -81,73 +67,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
     let sort: any = req.query.sort;
     if (
       sort &&
-<<<<<<< HEAD
-      (sort == '-name' || sort == 'name' || sort == 'price' || sort == '-price')
-    ) {
-      let dir;
-      sort.includes('-') ? (dir = 'DESC') : (dir = 'ASC');
-      sort = [[`${sort.replace('-', '')}`, dir]];
-    } else {
-      sort = [['id', 'ASC']];
-    }
-
-    const category = req.query.category as unknown as String;
-
-    if (
-      category &&
-      (category == 'Steel' ||
-        category == 'Watches' ||
-        category == 'Skincare' ||
-        category == 'Handbags' ||
-        category == 'Sun Glasses')
-    ) {
-      conditions = {
-        ...conditions,
-        category: category,
-      };
-    }
-
-    const products = await ProductsModel.findAll({
-      where: conditions,
-      attributes: [
-        'id',
-        'name',
-        'price',
-        'category',
-        'description',
-        'finalPrice',
-        'newArrivals',
-        'discount',
-        'quantity',
-        'image_name',
-        'image_secure_url',
-        'createdAt',
-        'updatedAt',
-        [sequelize.fn('AVG', sequelize.col('reviews.rating')), 'averageStars'],
-        [sequelize.fn('COUNT', sequelize.col('reviews.rating')), 'ratingNumbers'],
-      ],
-      include: [{
-        model: ReviewsModel,
-        attributes: [],
-      }],
-      group: ['products.id'],
-      subQuery: false,
-      order: sort,
-      limit: Number(limit),
-      offset: (page - 1) * limit,
-    });
-
-    const count = await ProductsModel.count({ where: conditions });
-
-    return res.status(200).json({ data: { message: 'success', count, page, limit, products } });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-
-=======
       (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
     ) {
       let dir;
@@ -202,7 +121,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
     return res.sendStatus(500);
   }
 };
->>>>>>> 51d2a88e810767ba8fb4d27a958563a8157017bd
 
 export const getProductById = async (req: Request, res: Response) => {
   try {
@@ -235,24 +153,12 @@ export const getProductById = async (req: Request, res: Response) => {
       avgRate = 0;
     }
 
-<<<<<<< HEAD
-
-
-
-export const createProduct = async (req: Request, res: Response) => {
-  const newProduct = req.body;
-  const { error, value: validatedNewProduct } =
-    productValidator.validate(newProduct);
-  if (error) {
-    return res.status(400).json({ error });
-=======
     return res.status(200).json({
       message: "success",
       product: { ...product?.dataValues, averageRating: Number(avgRate) },
     });
   } catch (error) {
     return res.sendStatus(500);
->>>>>>> 51d2a88e810767ba8fb4d27a958563a8157017bd
   }
 };
 
