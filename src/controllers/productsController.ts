@@ -14,7 +14,9 @@ import cloudinary from "../config/fileSystem";
 dotenv.config();
 applyFileSystem();
 
+
 let thumbnailOptions : any = { width: 100, height: 100, fit:"cover", responseType: 'base64', jpegOptions: { force:true, quality:100 } };
+
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {

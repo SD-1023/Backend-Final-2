@@ -2,11 +2,11 @@
   "name": "ecommercefinaltapg2",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "src/app.ts",
   "scripts": {
-    "start": "nodemon ./dist/src/app.js",
-    "build": "tsc",
-    "startDeployed": "node dist/src/app.js"
+    "start": "tsx watch app.ts",
+    "build": "rm -rf build/ && tsc && cp package.json ./dist/",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
@@ -23,13 +23,17 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.7.0",
     "sequelize": "^6.35.2",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/image-thumbnail": "^1.0.4",
     "@types/multer": "^1.4.11",
+    "@types/uuid": "^9.0.7",
     "nodemon": "^3.0.2"
   }
 }

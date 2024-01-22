@@ -3,8 +3,7 @@ import { ReviewsModel } from './reviews';
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
-import { CategoriesModel } from "./categories";
-
+import { CategoriesModel } from './categories';
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -21,7 +20,7 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.DECIMAL(6, 2),
     allowNull: false,
   },
-  category: {
+  category: { 
     type: DataTypes.STRING(40),
     allowNull: false,
   },
@@ -34,6 +33,7 @@ export const ProductsModel = sequelize.define("products", {
     allowNull: false,
   },
   finalPrice: DataTypes.DECIMAL(6, 2),
+
   offer:{
     type:DataTypes.DECIMAL(5,2),
     allowNull:false,
@@ -52,8 +52,11 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
-});
+  brand_id :{   
+    type: DataTypes.INTEGER,
+  },
 
+});
 
 CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
 ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory"});
@@ -61,7 +64,6 @@ ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"});
 ProductsModel.hasMany(ProductsImagesModel,{foreignKey:"product_id"});
 ProductsImagesModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
 ReviewsModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
-
 
 //sequelize.sync({alter:true});
 

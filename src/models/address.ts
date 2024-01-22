@@ -40,3 +40,4 @@ export const AddressModel = sequelize.define('addresses', {
       allowNull: false,
     },
   });
+

@@ -18,13 +18,14 @@ import { CategoriesModel } from "./models/categories";
 import { UsersModel } from "./models/users";
 import { OrdersModel } from "./models/orders";
 import { CartsModel } from './models/cart';
+import { BrandsModel } from './models/brands';
 import cors from "cors";
+import { sequelize } from './config/database';
+import brandsRoutes from './routes/brands';
 
 const app = express();
 dotenv.config();
 
-
-app.use(cors())
 app.use(express.json());
 
 app.use("/products",productsRoutes);
@@ -36,21 +37,28 @@ app.use("/cart",cartRoutes);
 app.use("/orders",ordersRoutes);
 app.use("/addresses",addressesRoutes);
 app.use("/productsImages",productsImagesRoutes)
+app.use("/brands",brandsRoutes)
+
+
+
+
 
 
 
 // // * Only uncomment this to create a table in your database
-// *======================
 // const fillingProductsTables = async ()=>{
-//     await ProductsModel.sync({force:true});
 //     await fillTables();
     
-// }
-// fillingProductsTables()
+//  }
+//  fillingProductsTables()
 
+//* Only uncomment this to create a table in your database
+// const fillingTables = async ()=>{
+//  await fillTablesReviews();
+//     }
+//  fillingTables()
 // // *====================
 // const fillingReviewsTables = async ()=>{
-//     await ReviewsModel.sync({force:true});
 //     await fillTablesReviews();
     
 // }
@@ -58,21 +66,26 @@ app.use("/productsImages",productsImagesRoutes)
 
 // //*==================
 // const fillingTablesCategories = async () =>{
-//     await CategoriesModel.sync({force:true});
-//     await fillTablesCategories();
-// }
-// fillingTablesCategories()
+//    await fillTablesCategories();
+//  }
+//  fillingTablesCategories();
 
 // //*==================
 // const fillingTablesUsers_ =async() =>{
 //     await UsersModel.sync({force:true});
+
 //     await fillingTablesUsers();
 // }
 // fillingTablesUsers_()
 
+// const fillTablesBrands =async() =>{
+//     await BrandsModel.sync({force:true});
+//    await fillTablesBrands();
+// }
+// fillTablesBrands()
 // //*===================
 // const fillingTablesOrders_ = async () =>{
-//     await OrdersModel.sync({force :true});
+//      await OrdersModel.sync({force:true});
 //     await fillingTablesOrders();
 // }
 // fillingTablesOrders_();
