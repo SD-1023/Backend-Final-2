@@ -14,7 +14,7 @@ import productsThumbnailsRoutes from "./routes/productsThumbnailImages";
 import productsImagesRoutes from "./routes/productsImagesRoutes";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
-import { fillTables, fillTablesCategories, fillTablesReviews, fillingTablesOrders, fillingTablesUsers, filingTablesWishLists, fillingTablesAddresses, fillingTablesCart, fillTablesBrands } from "./utils/faker";
+import { fillTables, fillTablesCategories, fillTablesReviews, fillingTablesOrders, fillingTablesUsers, filingTablesWishLists, fillingTablesAddresses, fillingTablesCart } from "./utils/faker";
 import { CategoriesModel } from "./models/categories";
 import { UsersModel } from "./models/users";
 import { OrdersModel } from "./models/orders";
