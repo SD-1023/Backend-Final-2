@@ -25,9 +25,16 @@ import { sequelize } from "./config/database";
 
 const app = express();
 dotenv.config();
-app.use(cors());
 app.use(express.json());
 
+// const corsOptions = {
+//   origin: "*", // Specify your client's origin
+//   methods: "GET,HEAD,,PATCH,POST,DELETE",
+//   allowedHeaders: "Content-Type,Authorization",
+// };
+
+// Use CORS middleware with options
+app.use(cors());
 // sequelize
 //   .authenticate()
 //   .then(() => {

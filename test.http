@@ -1,5 +1,46 @@
 ### POST
 http://localhost:3000/faker/cat
 
+
+### gET
+GET http://localhost:3000/users?page=12
+
+###
+GET http://localhost:3000/addresses/
+
 ### POST Generate Products Route ###
 POST http://161.156.81.77:4000/faker/generate-products
+
+
+### Sign Up
+POST http://localhost:3000/users/signup
+Content-Type: application/json
+
+{
+  "username": "marwan22226",
+  "email": "marwan1@test.com",
+  "password": "123123"
+}
+
+### Sign In
+POST http://localhost:3000/users/signin
+Content-Type: application/json
+
+{
+  "email": "marwan1@test.com",
+  "password": "1212124"
+}
+
+### Sign Out
+PUT http://localhost:3000/users/signout
+Authorization: b292e5f8-5f29-4c56-a27f-5c8004316c09
+
+### Change Password
+PUT http://localhost:3000/users/changePassword
+Authorization: f5f1b1d5-ae28-4de8-ab87-498891e360a5
+Content-Type: application/json
+
+{
+  "currentPassword": "1212124",
+  "newPassword": "1212124"
+}
