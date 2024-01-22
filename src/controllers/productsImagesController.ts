@@ -1,6 +1,8 @@
+import { uriImageLinkSchema } from './../validators/validations';
 import { ProductsImagesModel } from './../models/productsImages';
 import { Request, Response } from "express";
 import cloudinary from "../config/fileSystem";
+import imageThumbnail from "image-thumbnail"
 
 
 export const getAllImagesById = async (req:Request ,res:Response) =>{
@@ -28,6 +30,12 @@ export const createProductImages = async (req :Request,res:Response)=>{
         if(Number.isNaN(productId)){
             return res.sendStatus(400);
         }
+        const alt = req.body.alt;
+        const isMain = req.body.isMain;
+        console.log(isMain)
+        if(isMain != "false" && isMain != "true"){
+            return res.status(400).json({error:"isMain is required"})
+        }
 
         const imageFile : any = req.files;
         if(imageFile?.length == 0){
@@ -37,8 +45,9 @@ export const createProductImages = async (req :Request,res:Response)=>{
             return res.status(400).json({error:"max allowed 10 images at once"})
         }
         const mainImages : any = [];
+        const thumbnails : any = [];
         const expectedLength = imageFile.length;
-
+        let options = { width: 100, height: 100, fit:"cover", responseType: 'base64', jpegOptions: { force:true, quality:100 } }
         
         imageFile?.forEach(async(e : any)=>{
                 let base64Image = e.buffer.toString('base64');
@@ -47,17 +56,33 @@ export const createProductImages = async (req :Request,res:Response)=>{
                   resource_type:"image",
                   folder:process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH,
                   transformation:[{width:1400,height:1400,crop:"fit"}]
-                }).then((result)=>{
+                }).then(async(result)=>{
+                    let thumbnail = await imageThumbnail(`${base64Image}`,options as any)
+                    
                     mainImages.push(result.secure_url);
-                  const insertNewProductThumbnailToDB = ProductsImagesModel.create({
+
+                    let thumbnailImg : any;
+                    let uploadedThumbnail = await cloudinary.uploader.upload(`data:image/png;base64,${thumbnail}`,{
+                        use_filename: true,
+                        resource_type:"image",
+                        folder:process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
+                    }).then((thumbnailResult)=>{
+                        thumbnailImg = thumbnailResult.secure_url;
+                        thumbnails.push(thumbnailResult.secure_url)
+                    })
+                  const insertNewProductImagesToDb = ProductsImagesModel.create({
                     product_id:productId,
                     image_url: result.secure_url,
+                    thumbnail_url:thumbnailImg,
+                    alt,
+                    isMain,
                 }).then(()=>{
                     if(expectedLength == mainImages.length){
                         return res.status(201).json({
                               message: "success",
                               productId,
                               productImages:mainImages,
+                              thumbnails,
                         }); 
                     }
                 }).catch((error)=>{
@@ -74,7 +99,7 @@ export const createProductImages = async (req :Request,res:Response)=>{
 
 export const updateProductImage = async (req: Request,res:Response) =>{
     try{
-        const id = req.params.id;
+        const id = Number(req.params.id);
         if(Number.isNaN(id)){
             return res.sendStatus(400);
         }
@@ -87,14 +112,20 @@ export const updateProductImage = async (req: Request,res:Response) =>{
         }
 
         const imageFile = req.file;
-            const { buffer } : any = imageFile;
-            let base64Image = buffer.toString('base64');
+        const { buffer } : any = imageFile;
+        let base64Image = buffer.toString('base64');
 
-            let url : string = req.body.imageUrl
-            let splitted = url.split("/");
-            let imgWithExt = splitted[splitted.length - 1]
-            let img = imgWithExt.split(".")[0]
-            console.log(img,"img")
+        let url : string = req.body.imageUrl
+        const { error :invalidImage } = uriImageLinkSchema.validate(url);
+        if(invalidImage){
+            return res.status(400).json({error:"Invalid image"});
+        }
+
+        let splitted = url.split("/");
+        let imgWithExt = splitted[splitted.length - 1]
+        let img = imgWithExt.split(".")[0]
+        console.log(img,"img")
+
         let deletedImg = await cloudinary.api.delete_resources(
             [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
             { type: 'upload', resource_type: 'image' }
