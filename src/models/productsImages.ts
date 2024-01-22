@@ -15,6 +15,19 @@ export const ProductsImagesModel = sequelize.define("productsImages",{
         type:DataTypes.STRING(128),
         allowNull:false,
     },
+    thumbnail_url :{
+        type:DataTypes.STRING(128),
+        allowNull:true,
+    },
+    alt :{
+        type:DataTypes.STRING(56),
+        allowNull:true,
+    },
+    isMain: {
+        type:DataTypes.BOOLEAN,
+        defaultValue:false,
+        allowNull:false
+    }
 },{
     timestamps:false
 })

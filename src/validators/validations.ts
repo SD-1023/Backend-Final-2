@@ -3,13 +3,34 @@ import Joi from "joi";
 export const productValidator = Joi.object({
     name:Joi.string().min(4).max(40).required(),
     price:Joi.number().min(0).required(),
-    category:Joi.string().valid("Skincare","Handbags","Jewellery","Watches","Eyewear"),
+    category:Joi.string().valid("Skincare","Handbags","Jewellery","Watches","Eyewear").required(),
     categoryId:Joi.number().integer().positive().required(),
     description:Joi.string().min(5).max(256).required(),
     finalPrice:Joi.number().max(Joi.ref('price')).default(Joi.ref('price')),
-    newArrivals:Joi.boolean().default(false),
-    discount:Joi.boolean().default(false),
+    offer:Joi.number().max(100).min(0).default(0).when('finalPrice',{
+      is:Joi.not(Joi.ref("price")),
+      then:Joi.invalid(0).required(),
+      otherwise:Joi.forbidden()
+    }),
+    alt:Joi.string().max(56).required(),
     quantity:Joi.number().min(0).default(1),
+})
+
+export const productValidatorForUpdate = Joi.object({
+  name:Joi.string().min(4).max(40),
+  price:Joi.number().min(0),
+  category:Joi.string().valid("Skincare","Handbags","Jewellery","Watches","Eyewear"),
+  categoryId:Joi.number().integer().positive(),
+  description:Joi.string().min(5).max(256),
+  finalPrice:Joi.number().max(Joi.ref('price')).default(Joi.ref('price')),
+  offer:Joi.number().max(100).min(0).default(0).when('finalPrice',{
+    is:Joi.not(Joi.ref("price")),
+    then:Joi.invalid(0),
+    otherwise:Joi.forbidden()
+  }),
+  alt:Joi.string().max(56),
+  quantity:Joi.number().min(0).default(1),
+  imageUrl:Joi.string().uri()
 })
 
 export const addresssSchema = Joi.object({
@@ -34,12 +55,16 @@ export const ordersSchema = Joi.object({
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
 });
 
-export const ratingReviewsSchema = Joi.object({
-    user_id: Joi.number().integer().required(),
-    product_id: Joi.number().integer().required(),
+export const reviewsSchema = Joi.object({
+    userId: Joi.number().integer().required(),
     rating: Joi.number().integer().min(1).max(5).required(),
     comment: Joi.string().min(1).required(),
-  });
+});
+
+export const updateReviewSchema = Joi.object({
+  newComment: Joi.string().min(1),
+  newRating: Joi.number().integer().min(1).max(5),
+});
 
 export const usersSchema = Joi.object({
     username: Joi.string().alphanum().min(3).max(50).required(),
@@ -52,6 +77,7 @@ export const wishListSchema = Joi.object({
   userId:Joi.number().integer().positive().required(),
 })
 
+
   export const brandSchema = Joi.object({
     name: Joi.string().min(3).max(40).required(),
     image_secure_url: Joi.string().allow(null).max(128),
@@ -59,3 +85,5 @@ export const wishListSchema = Joi.object({
     // Add any other fields you want to validate here
   });
   
+
+export const uriImageLinkSchema = Joi.string().uri().required();

@@ -36,3 +36,4 @@ export const deleteImgFromFileSystem = async (imageSecureUrl : string,PathOfClou
 }
 
 export default cloudinary;
+
