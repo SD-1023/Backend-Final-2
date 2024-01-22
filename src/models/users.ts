@@ -27,6 +27,6 @@ export const UsersModel = sequelize.define('users', {
     allowNull:true
   },
 }, {
-  timestamps: false,
+  
   
 });

@@ -43,26 +43,6 @@ app.use("/brands",brandsRoutes)
 
 
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log(
-      "Connection to the database has been established successfully."
-    );
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
-
-// sequelize
-//   .sync({ force: true })
-//   .then(() => {
-//     console.log("Database synced");
-//   })
-//   .catch((err) => {
-//     console.log("Error syncing the database", err);
-//   });
-
 
 
 

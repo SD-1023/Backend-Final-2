@@ -21,7 +21,7 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.DECIMAL(6, 2),
     allowNull: false,
   },
-  category: { //id
+  category: { 
     type: DataTypes.STRING(40),
     allowNull: false,
   },
@@ -38,13 +38,13 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
-  discount: DataTypes.BOOLEAN, // should add the discount amount 
+  discount: DataTypes.BOOLEAN, 
   quantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
   },
-  image_name: { /// no need 
+  image_name: { 
     type: DataTypes.STRING(128),
     allowNull: true,
     defaultValue: null,
@@ -53,7 +53,7 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
-  brand_id :{   // add it 
+  brand_id :{   
     type: DataTypes.INTEGER,
   },
 
