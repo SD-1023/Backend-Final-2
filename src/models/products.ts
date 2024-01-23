@@ -65,6 +65,7 @@ ProductsModel.belongsTo(CategoriesModel, {
   foreignKey: "Category__Id",
   as: "productsCategory",
 });
+
 ProductsModel.hasMany(ReviewsModel, { foreignKey: "product_id" });
 ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
