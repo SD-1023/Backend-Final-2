@@ -1,35 +1,9 @@
-<<<<<<< HEAD
 import { ProductsImagesModel } from "./productsImages";
-import { ProductsThumbnailImagesModel } from "./productsThumbnailsImages";
+import { ReviewsModel } from "./reviews";
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
-import {
-  fillTables,
-  fillTablesCategories,
-  fillTablesReviews,
-  fillingTablesOrders,
-  fillingTablesUsers,
-  filingTablesWishLists,
-  fillingTablesAddresses,
-  fillingTablesCart,
-} from "../utils/faker";
-import { ReviewsModel } from "../models/reviews";
-import { CategoriesModel } from "../models/categories";
-import { UsersModel } from "../models/users";
-import { OrdersModel } from "../models/orders";
-import { CartsModel } from "../models/cart";
-import { WishlistsModel } from "../models/wishlist";
-import { AddressModel } from "../models/address";
-
-=======
-import { ProductsImagesModel } from './productsImages';
-import { ReviewsModel } from './reviews';
-import { DataTypes } from "sequelize";
-import dotenv from "dotenv";
-import { sequelize } from "../config/database";
-import { CategoriesModel } from './categories';
->>>>>>> 9604d9121b9c910101fbf92cb54cbb0c26140a5d
+import { CategoriesModel } from "./categories";
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -46,7 +20,7 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.DECIMAL(6, 2),
     allowNull: false,
   },
-  category: { 
+  category: {
     type: DataTypes.STRING(40),
     allowNull: false,
   },
@@ -60,10 +34,10 @@ export const ProductsModel = sequelize.define("products", {
   },
   finalPrice: DataTypes.DECIMAL(6, 2),
 
-  offer:{
-    type:DataTypes.DECIMAL(5,2),
-    allowNull:false,
-    defaultValue:0,
+  offer: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: false,
+    defaultValue: 0,
   },
   quantity: {
     type: DataTypes.INTEGER,
@@ -78,7 +52,9 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
-<<<<<<< HEAD
+  brand_id: {
+    type: DataTypes.INTEGER,
+  },
 });
 
 CategoriesModel.hasMany(ProductsModel, {
@@ -90,46 +66,11 @@ ProductsModel.belongsTo(CategoriesModel, {
   as: "productsCategory",
 });
 ProductsModel.hasMany(ReviewsModel, { foreignKey: "product_id" });
-ProductsModel.hasMany(ProductsThumbnailImagesModel, {
-  foreignKey: "product_id",
-});
 ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
-ProductsThumbnailImagesModel.belongsTo(ProductsModel, {
-  foreignKey: "product_id",
-});
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 
-sequelize.sync({ force: false });
-//*==================
-
-// const fillingTablesCategories = async () => {
-//   await CategoriesModel.sync({ force: false });
-//   await fillTablesCategories();
-// };
-// fillingTablesCategories();
-
-// const fillingProductsTables = async () => {
-//   await ProductsModel.sync({ force: false });
-//   await fillTables();
-// };
-// fillingProductsTables();
-=======
-  brand_id :{   
-    type: DataTypes.INTEGER,
-  },
-
-});
-
-CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
-ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory"});
-ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"});
-ProductsModel.hasMany(ProductsImagesModel,{foreignKey:"product_id"});
-ProductsImagesModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
-ReviewsModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
-
-//sequelize.sync({alter:true});
->>>>>>> 9604d9121b9c910101fbf92cb54cbb0c26140a5d
+sequelize.sync({ alter: true });
 
 // const fillingReviewsTables = async () => {
 //   await ReviewsModel.sync({ force: false });
