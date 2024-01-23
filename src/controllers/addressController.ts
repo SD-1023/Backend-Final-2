@@ -1,28 +1,9 @@
 import { Request, Response } from "express";
+import { UsersModel } from "../models/users";
+import { AddressModel } from "../models/address";
 
-export const getAddressByUserId = async (req:Request,res:Response) =>{
-    try{
+export const getAddressByUserId = async (req: Request, res: Response) => {};
 
-    }catch(error){
-        console.log(error)
-        return res.status(500).json(error)
-    }
-}
+export const createNewAddress = async (req: Request, res: Response) => {};
 
-export const createNewAddress = async (req:Request,res:Response) =>{
-    try{
-
-    }catch(error){
-        console.log(error)
-        return res.status(500).json(error)
-    }
-}
-
-export const updateAddress = async (req:Request,res:Response) =>{
-    try{
-
-    }catch(error){
-        console.log(error)
-        return res.status(500).json(error)
-    }
-}
+export const updateAddress = async (req: Request, res: Response) => {};

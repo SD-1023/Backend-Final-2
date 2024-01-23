@@ -126,6 +126,22 @@ export const getAllProducts = async (req: Request, res: Response) => {
   }
 };
 
+export const getNewArrivals = async (req: Request, res: Response) => {
+  try {
+    const latestProducts = await ProductsModel.findAll({
+      order: [["createdAt", "DESC"]],
+      limit: 4,
+    });
+
+    return res
+      .status(200)
+      .json({ data: { message: "success", latestProducts } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const getProductById = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);

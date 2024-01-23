@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "start": "tsx watch app.ts",
-    "build": "rm -rf build/ && tsc && cp package.json ./dist/",
+    "build": "rm -rf dist/ && tsc && cp package.json ./dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

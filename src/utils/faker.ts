@@ -16,9 +16,9 @@ const generateRandomData = () => {
     description: faker.commerce.productDescription(),
     quantity: faker.number.int({ min: 0, max: 10 }),
     discount: true,
-    finalPrice: faker.commerce.price({min:0, max: 150 }),
+    finalPrice: faker.commerce.price({ min: 0, max: 150 }),
     category: faker.commerce.productMaterial(),
-    Category__Id:faker.number.int({min:1,max:5}),
+    Category__Id: faker.number.int({ min: 1, max: 5 }),
   });
 
   const randomReviews = () => ({
@@ -47,33 +47,33 @@ const generateRandomData = () => {
     deliveryFee: faker.number.float({ min: 0, max: 15, precision: 2 }),
     subTotal: faker.number.float({ min: 200, max: 600, precision: 2 }),
     status: faker.helpers.arrayElement(["pending", "delivered", "cancelled"]),
-    grandTotal: faker.number.float({ min: 400, max: 700, precision: 2  }),
+    grandTotal: faker.number.float({ min: 400, max: 700, precision: 2 }),
   });
 
-  const randomWishLists = ()=>({
-    user_id:faker.number.int({min:1,max:50}),
-    product_id:faker.number.int({min:1,max:75}),
-  })
+  const randomWishLists = () => ({
+    user_id: faker.number.int({ min: 1, max: 50 }),
+    product_id: faker.number.int({ min: 1, max: 75 }),
+  });
 
-  const randomAddresses = ()=>({
-    street:faker.location.street(),
-    city:faker.location.city(),
-    country:faker.location.country(),
-    state:faker.location.state(),
-    postal_code:faker.finance.pin(),
-    country_calling_code:faker.location.countryCode('numeric'),
-    mobile_number:faker.phone.number(),
-    Full__Name:faker.person.fullName(),
-    user_id:faker.number.int({min:1,max:100}),
-  })
+  const randomAddresses = () => ({
+    street: faker.location.street(),
+    city: faker.location.city(),
+    country: faker.location.country(),
+    state: faker.location.state(),
+    postal_code: faker.finance.pin(),
+    country_calling_code: faker.location.countryCode("numeric"),
+    mobile_number: faker.phone.number(),
+    Full__Name: faker.person.fullName(),
+    user_id: faker.number.int({ min: 1, max: 100 }),
+  });
 
-  const randomCart = ()=>({
-    product_id:faker.number.int({min:1,max:100}),
-    product_name:faker.commerce.productName(),
-    user_id:faker.number.int({min:1,max:100}),
-    quantity:faker.number.int({min:1,max:10}),
-    product_price:faker.number.float({min:10,max:500,precision:2}),
-  })
+  const randomCart = () => ({
+    product_id: faker.number.int({ min: 1, max: 100 }),
+    product_name: faker.commerce.productName(),
+    user_id: faker.number.int({ min: 1, max: 100 }),
+    quantity: faker.number.int({ min: 1, max: 10 }),
+    product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
+  });
 
   return {
     randomProducts,
@@ -83,14 +83,14 @@ const generateRandomData = () => {
     randomOrders,
     randomWishLists,
     randomAddresses,
-    randomCart
+    randomCart,
   };
 };
 
 export const fillTables = async () => {
   const { randomProducts } = generateRandomData();
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 150; i++) {
     const randomProduct = randomProducts();
     await ProductsModel.create(randomProduct);
     console.log(`ITERATION ==========> ${i} <================`);
@@ -139,31 +139,31 @@ export const fillingTablesOrders = async () => {
   }
 };
 
-export const filingTablesWishLists = async()=>{
+export const filingTablesWishLists = async () => {
   const { randomWishLists } = generateRandomData();
 
-  for(let i =0;i<100;i++){
+  for (let i = 0; i < 100; i++) {
     const randomWishList = randomWishLists();
     await WishlistsModel.create(randomWishList);
     console.log(`ITERATION ==========> ${i} <================`);
   }
-}
+};
 
-export const fillingTablesCart = async()=>{
+export const fillingTablesCart = async () => {
   const { randomCart } = generateRandomData();
 
-  for(let i = 0; i < 200 ; i++){
+  for (let i = 0; i < 200; i++) {
     const randomCartItem = randomCart();
     await CartsModel.create(randomCartItem);
   }
-}
+};
 
-export const fillingTablesAddresses = async()=>{
+export const fillingTablesAddresses = async () => {
   const { randomAddresses } = generateRandomData();
 
-  for(let i =0; i< 100; i++){
+  for (let i = 0; i < 100; i++) {
     const randomAddress = randomAddresses();
     await AddressModel.create(randomAddress);
     console.log(`ITERATION ==========> ${i} <================`);
   }
-}
+};
