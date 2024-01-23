@@ -12,7 +12,7 @@ const upload = multer({
 const router = express.Router();
 
 router.get("/", productsController.getAllProducts);
-router.get("/newArrivals", productsController.getNewArrivals);
+router.get("/newestProducts", productsController.getNewArrivals);
 router.get("/:id", productsController.getProductById);
 router.post("/", upload.any(), productsController.createProduct);
 router.put("/:id", productsController.updateProduct);
