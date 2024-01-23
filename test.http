@@ -6,10 +6,10 @@ http://localhost:3000/faker/cat
 GET http://localhost:3000/users?page=12
 
 ###
-GET http://localhost:3000/addresses/
+POST http://localhost:3000/faker/generate-brands
 
 ### POST Generate Products Route ###
-POST http://161.156.81.77:4000/faker/generate-cart
+POST http://161.156.81.77:4000/faker/generate-brands
 
 
 ### Sign Up

@@ -1,12 +1,13 @@
-import { CartsModel } from '../models/cart';
-import { AddressModel } from '../models/address';
-import { WishlistsModel } from '../models/wishlist';
+import { CartsModel } from "../models/cart";
+import { AddressModel } from "../models/address";
+import { WishlistsModel } from "../models/wishlist";
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
 import { CategoriesModel } from "../models/categories";
 import { UsersModel } from "../models/users";
 import { OrdersModel } from "../models/orders";
+import { BrandsModel } from "../models/brands";
 
 const generateRandomData = () => {
   const randomProducts = () => ({
@@ -75,6 +76,11 @@ const generateRandomData = () => {
     product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
   });
 
+  const randomBrands = () => ({
+    name: faker.company.name(),
+    image_secure_url: faker.image.url(),
+  });
+
   return {
     randomProducts,
     randomReviews,
@@ -84,6 +90,7 @@ const generateRandomData = () => {
     randomWishLists,
     randomAddresses,
     randomCart,
+    randomBrands,
   };
 };
 
@@ -166,4 +173,16 @@ export const fillingTablesAddresses = async () => {
     await AddressModel.create(randomAddress);
     console.log(`ITERATION ==========> ${i} <================`);
   }
+};
+
+export const fillBrandTable = async () => {
+  const { randomBrands } = generateRandomData();
+
+  for (let i = 0; i < 7; i++) {
+    const randomBrand = randomBrands();
+    await BrandsModel.create(randomBrand);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+
+  console.log(`Brands were created successfully`);
 };

@@ -10,6 +10,7 @@ import {
   filingTablesWishLists,
   fillingTablesAddresses,
   fillingTablesCart,
+  fillBrandTable,
 } from "../utils/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -19,6 +20,7 @@ import { OrdersModel } from "../models/orders";
 import { CartsModel } from "../models/cart";
 import { WishlistsModel } from "../models/wishlist";
 import { AddressModel } from "../models/address";
+import { BrandsModel } from "../models/brands";
 const router = express.Router();
 
 router.post("/generate-categories", async (req, res) => {
@@ -105,6 +107,17 @@ router.post("/generate-addresses", async (req, res) => {
     res.status(200).json({ message: "Addresses generated successfully" });
   } catch (error) {
     console.error("Error generating addresses:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/generate-brands", async (req, res) => {
+  try {
+    await BrandsModel.sync({ force: false });
+    await fillBrandTable();
+    res.status(200).json({ message: "Brands generated successfully" });
+  } catch (error) {
+    console.error("Error generating brands:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
