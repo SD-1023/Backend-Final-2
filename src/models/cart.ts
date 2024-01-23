@@ -30,6 +30,6 @@ export const CartsModel = sequelize.define('cart', {
   },
 },{
   freezeTableName:true,
-        timestamps: false,
+   timestamps: false,
 
 });
