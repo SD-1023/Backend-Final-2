@@ -15,7 +15,8 @@ import cloudinary from "../config/fileSystem";
 dotenv.config();
 applyFileSystem();
 
-let thumbnailOptions : any = { width: 100, height: 100, fit:"contain", responseType: 'base64', jpegOptions: { force:true, quality:100 } };
+let thumbnailOptions : any = { width: 100, height: 100, fit:"inside", responseType: 'base64', jpegOptions: { force:true, quality:100 } };
+
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -122,6 +123,22 @@ export const getAllProducts = async (req: Request, res: Response) => {
       .json({ message: "success", count, page, limit, products });
   } catch (error) {
     return res.sendStatus(500);
+  }
+};
+
+export const getNewArrivals = async (req: Request, res: Response) => {
+  try {
+    const latestProducts = await ProductsModel.findAll({
+      order: [["createdAt", "DESC"]],
+      limit: 4,
+    });
+
+    return res
+      .status(200)
+      .json({ data: { message: "success", latestProducts } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

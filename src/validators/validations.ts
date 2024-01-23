@@ -42,16 +42,14 @@ export const addresssSchema = Joi.object({
   user_id: Joi.number().integer().required(),
 });
 
-
 export const cartsSchema = Joi.object({
   user_id: Joi.number().integer().required(),
-  status: Joi.string().valid('active', 'completed', 'abandoned').required(),
+  status: Joi.string().valid("active", "completed", "abandoned").required(),
 });
-
 
 export const ordersSchema = Joi.object({
   user_id: Joi.number().integer().required(),
-  total: Joi.number().precision(2).required(), // Ensure this aligns with your DECIMAL(10, 2) definition
+  total: Joi.number().precision(2).required(), 
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
 });
 
@@ -67,15 +65,40 @@ export const updateReviewSchema = Joi.object({
 });
 
 export const usersSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(50).required(),
-    email: Joi.string().email({ tlds: { allow: false } }).required(),
-    password: Joi.string().min(6).max(100).required(),
-  });
+  username: Joi.string().alphanum().min(3).max(50).required(),
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+  password: Joi.string().min(6).max(100).required(),
+});
 
 export const wishListSchema = Joi.object({
-  productId:Joi.number().integer().positive().required(),
-  userId:Joi.number().integer().positive().required(),
-})
+  productId: Joi.number().integer().positive().required(),
+  userId: Joi.number().integer().positive().required(),
+});
+
+export const signupSchema = Joi.object({
+  username: Joi.string().alphanum().min(3).max(30).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+export const signinSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+export const changepassSchema = Joi.object({
+  currentPassword: Joi.string().min(6).required(),
+  newPassword: Joi.string().min(6).required(),
+});
+ 
+  export const brandSchema = Joi.object({
+    name: Joi.string().min(3).max(40).required(),
+    image_secure_url: Joi.string().allow(null).max(128),
+    id: Joi.number().integer().required(),
+    // Add any other fields you want to validate here
+  });
+  
 
 export const uriImageLinkSchema = Joi.string().uri().required();
-

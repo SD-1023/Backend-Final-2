@@ -16,11 +16,11 @@ export const OrdersModel = sequelize.define('orders', {
     type:DataTypes.INTEGER,
     allowNull:false
   },
-  discount: {
+  discount: { 
     type:DataTypes.DECIMAL(6, 2),
     allowNull:false,
   },
-  deliveryFee: {
+  deliveryFee: { 
     type:DataTypes.DECIMAL(6, 2),
     allowNull:false,
   },
@@ -40,6 +40,8 @@ export const OrdersModel = sequelize.define('orders', {
   grandTotal :{
     type:DataTypes.DECIMAL(6, 2),
     allowNull:false,
-  } // subTotal - discount - delivery fee
+  }, // subTotal - discount - delivery fee .
+
+
 });
 

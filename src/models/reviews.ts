@@ -1,8 +1,7 @@
-import {  DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
 
-
-export const ReviewsModel = sequelize.define('reviews', {
+export const ReviewsModel = sequelize.define("reviews", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
