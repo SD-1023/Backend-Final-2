@@ -50,6 +50,7 @@ export const createProductImages = async (req :Request,res:Response)=>{
         const expectedLength = imageFile.length;
         
         imageFile?.forEach(async(e : any)=>{
+            console.log(e)
                 let base64Image = e.buffer.toString('base64');
                 let UploadedImage = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
                   use_filename: true,
