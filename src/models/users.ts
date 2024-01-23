@@ -25,5 +25,8 @@ export const UsersModel = sequelize.define('users', {
   user_image: {
     type:DataTypes.STRING(40),
     allowNull:true
-  }
+  },
+}, {
+  
+  
 });

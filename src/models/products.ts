@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { ProductsImagesModel } from "./productsImages";
 import { ProductsThumbnailImagesModel } from "./productsThumbnailsImages";
 import { DataTypes } from "sequelize";
@@ -21,6 +22,14 @@ import { CartsModel } from "../models/cart";
 import { WishlistsModel } from "../models/wishlist";
 import { AddressModel } from "../models/address";
 
+=======
+import { ProductsImagesModel } from './productsImages';
+import { ReviewsModel } from './reviews';
+import { DataTypes } from "sequelize";
+import dotenv from "dotenv";
+import { sequelize } from "../config/database";
+import { CategoriesModel } from './categories';
+>>>>>>> 9604d9121b9c910101fbf92cb54cbb0c26140a5d
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -37,7 +46,7 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.DECIMAL(6, 2),
     allowNull: false,
   },
-  category: {
+  category: { 
     type: DataTypes.STRING(40),
     allowNull: false,
   },
@@ -50,25 +59,26 @@ export const ProductsModel = sequelize.define("products", {
     allowNull: false,
   },
   finalPrice: DataTypes.DECIMAL(6, 2),
-  newAriivals: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+
+  offer:{
+    type:DataTypes.DECIMAL(5,2),
+    allowNull:false,
+    defaultValue:0,
   },
-  discount: DataTypes.BOOLEAN,
   quantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
   },
-  image_name: {
+  alt: {
     type: DataTypes.STRING(128),
-    allowNull: true,
-    defaultValue: null,
+    allowNull: false,
   },
   image_secure_url: {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
+<<<<<<< HEAD
 });
 
 CategoriesModel.hasMany(ProductsModel, {
@@ -104,6 +114,22 @@ sequelize.sync({ force: false });
 //   await fillTables();
 // };
 // fillingProductsTables();
+=======
+  brand_id :{   
+    type: DataTypes.INTEGER,
+  },
+
+});
+
+CategoriesModel.hasMany(ProductsModel,{foreignKey:"Category__Id", as: "products"});
+ProductsModel.belongsTo(CategoriesModel,{foreignKey:"Category__Id", as: "productsCategory"});
+ProductsModel.hasMany(ReviewsModel,{foreignKey:"product_id"});
+ProductsModel.hasMany(ProductsImagesModel,{foreignKey:"product_id"});
+ProductsImagesModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+ReviewsModel.belongsTo(ProductsModel,{foreignKey:"product_id"});
+
+//sequelize.sync({alter:true});
+>>>>>>> 9604d9121b9c910101fbf92cb54cbb0c26140a5d
 
 // const fillingReviewsTables = async () => {
 //   await ReviewsModel.sync({ force: false });

@@ -11,4 +11,29 @@ export const applyFileSystem = () => {
   });
 };
 
+export const deleteImgFromFileSystem = async (imageSecureUrl : string,PathOfCloudinary : string)=>{
+    
+    if(PathOfCloudinary != process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH &&
+       PathOfCloudinary != process.env.PRODUCTS_IMAGES_FOLDER_PATH  &&
+       PathOfCloudinary != process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH &&
+       PathOfCloudinary != process.env.USERS_IMAGES_FOLDER_PATH){
+        return new Error("Invalid Input")
+    }else if(!imageSecureUrl || imageSecureUrl.trim() == ""){
+            return new Error("Invalid Input")
+    }
+
+    let splitted = imageSecureUrl.split("/");
+    let imgWithExt = splitted[splitted.length - 1]
+    let img = imgWithExt.split(".")[0]
+    console.log(img,"img");
+
+    let deletedImg = await cloudinary.api.delete_resources(
+      [`${PathOfCloudinary}/${img}`],
+      { type: 'upload', resource_type: 'image' }
+    );
+
+    return deletedImg;
+}
+
 export default cloudinary;
+

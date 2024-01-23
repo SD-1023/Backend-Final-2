@@ -1,6 +1,6 @@
-import { CartsModel } from "./../models/cart";
-import { AddressModel } from "./../models/address";
-import { WishlistsModel } from "./../models/wishlist";
+import { CartsModel } from '../models/cart';
+import { AddressModel } from '../models/address';
+import { WishlistsModel } from '../models/wishlist';
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
