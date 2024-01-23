@@ -4,14 +4,7 @@ import { CategoriesModel } from "../models/categories";
 
 export const getAllCategories = async (req:Request , res:Response) =>{
     try{
-        let count = Number(req.query.count) || 5;
-        if(count > 20 || count < 1){
-            count = 5;
-        }
-
-        const categories = await CategoriesModel.findAll({
-            limit:count,
-        });
+        const categories = await CategoriesModel.findAll();
         const returnedCount = categories.length;
 
         return res.status(200).json({message:"success", count:returnedCount , categories})
