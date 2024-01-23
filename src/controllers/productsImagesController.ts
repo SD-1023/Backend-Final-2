@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import cloudinary from "../config/fileSystem";
 import imageThumbnail from "image-thumbnail"
 
+let thumbnailOptions : any= { width: 100, height: 100, fit:"inside", responseType: 'base64', jpegOptions: { force:true, quality:100 } }
 
 export const getAllImagesById = async (req:Request ,res:Response) =>{
     try{
@@ -47,9 +48,9 @@ export const createProductImages = async (req :Request,res:Response)=>{
         const mainImages : any = [];
         const thumbnails : any = [];
         const expectedLength = imageFile.length;
-        let options = { width: 100, height: 100, fit:"cover", responseType: 'base64', jpegOptions: { force:true, quality:100 } }
         
         imageFile?.forEach(async(e : any)=>{
+            console.log(e)
                 let base64Image = e.buffer.toString('base64');
                 let UploadedImage = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
                   use_filename: true,
@@ -57,7 +58,7 @@ export const createProductImages = async (req :Request,res:Response)=>{
                   folder:process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH,
                   transformation:[{width:1400,height:1400,crop:"fit"}]
                 }).then(async(result)=>{
-                    let thumbnail = await imageThumbnail(`${base64Image}`,options as any)
+                    let thumbnail = await imageThumbnail(`${base64Image}`,thumbnailOptions)
                     
                     mainImages.push(result.secure_url);
 
@@ -148,6 +149,36 @@ export const updateProductImage = async (req: Request,res:Response) =>{
         }).then(()=>{
             return res.status(201).json({message:"success"})
         })
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({error});
+    }
+}
+
+export const changeImageAlt = async (req:Request,res:Response)=>{
+    try{
+        const id = Number(req.params.id);
+        if(Number.isNaN(id)){
+            return res.sendStatus(400);
+        }
+        const alt : string= req.body._alt;
+        
+        if(typeof alt != "string" || alt.length > 40){
+            return res.sendStatus(400);
+        }
+        const updateImage = await ProductsImagesModel.update({
+            alt:alt
+        },{
+            where:{
+                id:id,
+            }
+        })
+
+        if(updateImage[0] == 0){
+            return res.status(400).json({error:"no such product exist"});
+        }
+
+        return res.status(201).json({message:"success",newAlt:alt})
     }catch(error){
         console.log(error);
         return res.status(500).json({error});

@@ -21,7 +21,7 @@ export const deleteImgFromFileSystem = async (imageSecureUrl : string,PathOfClou
     }else if(!imageSecureUrl || imageSecureUrl.trim() == ""){
             return new Error("Invalid Input")
     }
-
+    console.log("WE HAVE PASSED THE CONDITIONS ")
     let splitted = imageSecureUrl.split("/");
     let imgWithExt = splitted[splitted.length - 1]
     let img = imgWithExt.split(".")[0]

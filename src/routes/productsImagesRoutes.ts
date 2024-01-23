@@ -13,5 +13,6 @@ const router = express.Router();
 router.get("/:id",productsImagesController.getAllImagesById);
 router.post("/",upload.any(),productsImagesController.createProductImages);
 router.put("/:id",upload.single('image'),productsImagesController.updateProductImage);
+router.patch("/altEdit/:id",productsImagesController.changeImageAlt);
 
 export default router;

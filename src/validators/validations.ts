@@ -4,7 +4,7 @@ export const productValidator = Joi.object({
     name:Joi.string().min(4).max(40).required(),
     price:Joi.number().min(0).required(),
     category:Joi.string().valid("Skincare","Handbags","Jewellery","Watches","Eyewear").required(),
-    categoryId:Joi.number().integer().positive().required(),
+    categoryId:Joi.number().integer().min(0).required(),
     description:Joi.string().min(5).max(256).required(),
     finalPrice:Joi.number().max(Joi.ref('price')).default(Joi.ref('price')),
     offer:Joi.number().max(100).min(0).default(0).when('finalPrice',{
