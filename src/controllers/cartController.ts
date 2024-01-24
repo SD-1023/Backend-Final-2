@@ -13,7 +13,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
     }
 
     const carts = await CartsModel.findAll({
-      attributes: { exclude: ['id'] }, // Exclude the 'id' field from the response
+      attributes: { exclude: ['id'] }, 
       where: { user_id: userId },
     });
 
@@ -46,7 +46,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
       }
     }
 
-    return res.status(200).json({ message: 'Success', cartItems });
+    return res.status(200).json({ message: 'success', cartItems });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -91,7 +91,7 @@ export const addToCart = async (req: Request, res: Response) => {
       });
     }
 
-    return res.status(200).json({ message: 'Success', cart });
+    return res.status(200).json({ message: 'success', cart });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -120,7 +120,7 @@ export const deleteFromCart = async (req: Request, res: Response) => {
       where: { user_id: userId, product_id: productId },
     });
 
-    return res.status(200).json({ message: 'Product removed from cart successfully' });
+    return res.status(200).json({ message: 'success' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -139,7 +139,7 @@ export const clearCart = async (req: Request, res: Response) => {
       where: { user_id: userId },
     });
 
-    return res.status(200).json({ message: 'Cart cleared successfully' });
+    return res.status(200).json({ message: 'success' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -165,12 +165,9 @@ export const decreaseQuantity = async (req: Request, res: Response) => {
 
     await cart.update({ quantity: currentQuantity - 1 });
 
-    const updatedCartItem = await CartsModel.findOne({
-      attributes: { exclude: ['id'] }, 
-      where: { user_id: userId, product_id: productId },
-    });
+    return res.status(200).json({ message: 'success', updatedCartItem: cart });
 
-    return res.status(200).json({ message: 'Product quantity decreased successfully', updatedCartItem });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -193,12 +190,9 @@ export const increaseQuantity = async (req: Request, res: Response) => {
     const currentQuantity: number = cart.get('quantity') as number;
     await cart.update({ quantity: currentQuantity + 1 });
 
-    const updatedCartItem = await CartsModel.findOne({
-      attributes: { exclude: ['id'] },
-      where: { user_id: userId, product_id: productId },
-    });
+    return res.status(200).json({ message: 'success', updatedCartItem: cart });
 
-    return res.status(200).json({ message: 'Product quantity increased successfully', updatedCartItem });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });

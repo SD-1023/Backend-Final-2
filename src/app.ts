@@ -30,7 +30,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-// app.use("/faker", fakerRoutes);
+app.use("/faker", fakerRoutes);
 // app.use("/products", productsRoutes);
 // app.use("/reviews", reviewsRoutes);
 // app.use("/categories", categoriesRoutes);

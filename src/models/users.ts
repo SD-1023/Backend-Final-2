@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from "../config/database";
+import { AddressModel } from './address';
 
 
 export const UsersModel = sequelize.define('users', {
@@ -26,7 +27,11 @@ export const UsersModel = sequelize.define('users', {
     type:DataTypes.STRING(40),
     allowNull:true
   },
-}, {
-  
   
 });
+
+
+AddressModel.belongsTo(UsersModel, {foreignKey: 'user_id',  as: 'user',});
+
+UsersModel.hasMany(AddressModel, { foreignKey: 'user_id', as: 'addresses',});
+

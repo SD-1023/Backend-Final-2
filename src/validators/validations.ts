@@ -53,6 +53,8 @@ export const ordersSchema = Joi.object({
   user_id: Joi.number().integer().required(),
   total: Joi.number().precision(2).required(), 
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
+  adress_id: Joi.number().integer().required(),
+
 });
 
 export const reviewsSchema = Joi.object({
@@ -100,6 +102,11 @@ export const changepassSchema = Joi.object({
     image_secure_url: Joi.string().allow(null).max(128),
     id: Joi.number().integer().required(),
   });
-  
+  export const orderProductsSchema = Joi.object({
+    order_id: Joi.number().integer().required(),
+    product_id: Joi.number().integer().required(),
+    id: Joi.number().integer().required(),
+
+  });
 
 export const uriImageLinkSchema = Joi.string().uri().required();
