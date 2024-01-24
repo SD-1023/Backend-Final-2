@@ -41,16 +41,20 @@ export const addresssSchema = Joi.object({
   country: Joi.string().max(64).required(),
   user_id: Joi.number().integer().required(),
 });
-
 export const cartsSchema = Joi.object({
+  product_name: Joi.string().max(40).required(),
+  product_id: Joi.string().max(40).required(),
+  product_price: Joi.number().precision(6).min(0).required(),
   user_id: Joi.number().integer().required(),
-  status: Joi.string().valid("active", "completed", "abandoned").required(),
+  quantity: Joi.number().integer().required(),
 });
 
 export const ordersSchema = Joi.object({
   user_id: Joi.number().integer().required(),
   total: Joi.number().precision(2).required(), 
   status: Joi.string().valid('pending', 'completed', 'cancelled').required(),
+  adress_id: Joi.number().integer().required(),
+
 });
 
 export const reviewsSchema = Joi.object({
@@ -97,8 +101,12 @@ export const changepassSchema = Joi.object({
     name: Joi.string().min(3).max(40).required(),
     image_secure_url: Joi.string().allow(null).max(128),
     id: Joi.number().integer().required(),
-    // Add any other fields you want to validate here
   });
-  
+  export const orderProductsSchema = Joi.object({
+    order_id: Joi.number().integer().required(),
+    product_id: Joi.number().integer().required(),
+    id: Joi.number().integer().required(),
+
+  });
 
 export const uriImageLinkSchema = Joi.string().uri().required();

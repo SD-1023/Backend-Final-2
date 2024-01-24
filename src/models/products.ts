@@ -70,7 +70,7 @@ ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 
-sequelize.sync({ alter: true });
+//sequelize.sync({ alter: true });
 
 // const fillingReviewsTables = async () => {
 //   await ReviewsModel.sync({ force: false });
