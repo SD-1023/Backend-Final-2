@@ -4,7 +4,6 @@ import { UsersModel } from './users';
 import { AddressModel } from './address';
 import { OrderProducts } from './orderProducts';
 
-
 export const OrdersModel = sequelize.define('orders', {
   id: {
     type: DataTypes.INTEGER,
@@ -32,25 +31,35 @@ export const OrdersModel = sequelize.define('orders', {
     allowNull: false,
     defaultValue: 'pending',
   },
-  rating: {
-    type:DataTypes.DECIMAL(6,2),
-    allowNull:false,
-  },
   grandTotal :{
     type:DataTypes.DECIMAL(6, 2),
     allowNull:false,
-  }, // subTotal - discount - delivery fee .
-  address_id: {
-    type: DataTypes.INTEGER,
+  },
+  street :{
+    type: DataTypes.STRING(128),
     allowNull: false,
   },
-
-
+  city :{
+    type: DataTypes.STRING(64),
+    allowNull: false,
+  },
+  mobile_number :{
+    type:DataTypes.STRING(32),
+  },
+  country: {
+    type: DataTypes.STRING(64),
+    allowNull: false,
+  },
+  unit_price:{
+    type:DataTypes.DECIMAL(6,2),
+    allowNull:false
+  },
+  unit_quantity:{
+      type:DataTypes.INTEGER,
+      allowNull:false
+  }
+  // subTotal - discount - delivery fee .
 });
-UsersModel.hasOne(OrdersModel, { foreignKey: 'user_id', as: 'order' });
-OrdersModel.belongsTo(UsersModel, { foreignKey: 'user_id', as: 'user' });
-OrdersModel.belongsTo(AddressModel, { foreignKey: 'address_id', as: 'address' });
-OrdersModel.hasMany(OrderProducts, { foreignKey: 'order_id' });
 
 
 

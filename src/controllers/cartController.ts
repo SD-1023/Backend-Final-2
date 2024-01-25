@@ -5,6 +5,7 @@ import { cartsSchema } from "../validators/validations"
 
 
 export const getCartByUserId = async (req: Request, res: Response) => {
+
   try {
     const userId = parseInt(req.params.id);
 
@@ -33,8 +34,17 @@ export const getCartByUserId = async (req: Request, res: Response) => {
           error: 'Product not found for the specified product ID',
         });
       } else {
+
+        const product = await ProductsModel.findOne({ where: { id: product_id } });
+  
+        if (!product) {
+          return res.status(400).json({ error: 'Product not found for the specified product ID' });
+        }
+  
+        const product_name: string = product.get('name') as string;
         const productDescription: string = product.get('description') as string;
         const productImageSecureUrl: string = product.get('image_secure_url') as string;
+
         const finalPrice: number = parseFloat(product.get('finalPrice') as string);
 
         cartItems.push({
@@ -72,11 +82,19 @@ export const addToCart = async (req: Request, res: Response) => {
       if (quantity >= currentQuantity) {
         await cart.update({ quantity });
       }
+  
+      const cart = await CartsModel.findOne({
+        where: { user_id: userId, product_id: productId },
+      });
+  
+      if (!cart) {
+        return res.status(2).json({ error: 'Product not found in the user\'s cart' });
     } else {
       const product = await ProductsModel.findOne({ where: { id: product_id } });
 
       if (!product) {
         return res.status(404).json({ error: 'Product not found for the specified product ID' });
+
       }
 
       const product_name: string = product.get('name') as string;
