@@ -68,12 +68,12 @@ ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 
+
 UsersModel.hasMany(OrdersModel,{foreignKey:"user_id"});
 
 OrdersModel.belongsTo(UsersModel,{foreignKey:"user_id"});
-//OrdersModel.belongsTo(AddressModel,{foreignKey:""})
+//sequelize.sync({ alter: true });
 
-//sequelize.sync({alter:true});
 
 // const fillingReviewsTables = async () => {
 //   await ReviewsModel.sync({ force: false });

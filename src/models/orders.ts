@@ -1,5 +1,8 @@
 import {DataTypes } from 'sequelize';
 import { sequelize } from "../config/database";
+import { UsersModel } from './users';
+import { AddressModel } from './address';
+import { OrderProducts } from './orderProducts';
 
 export const OrdersModel = sequelize.define('orders', {
   id: {
@@ -10,10 +13,6 @@ export const OrdersModel = sequelize.define('orders', {
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  },
-  product_id : {
-    type:DataTypes.INTEGER,
-    allowNull:false
   },
   discount: { 
     type:DataTypes.DECIMAL(6, 2),
@@ -61,4 +60,6 @@ export const OrdersModel = sequelize.define('orders', {
   }
   // subTotal - discount - delivery fee .
 });
+
+
 

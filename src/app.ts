@@ -42,7 +42,7 @@ app.use("/addresses", addressesRoutes);
 app.use("/productsImages", productsImagesRoutes);
 app.use("/brands", brandsRoutes);
 
-const PORT = process.env.PORT;
+const PORT = 3000;
 app.listen(PORT, () =>
   console.log(`Server is running in development mode on PORT : ${PORT}`)
 );
