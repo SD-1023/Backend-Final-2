@@ -3,7 +3,7 @@ http://localhost:3000/faker/cat
 
 
 ### gET
-GET http://localhost:3000/users?page=12
+GET http://localhost:3000/products/getTopRated
 
 ###
 POST http://localhost:3000/faker/generate-brands
