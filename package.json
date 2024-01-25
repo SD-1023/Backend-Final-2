@@ -4,8 +4,9 @@
   "description": "",
   "main": "src/app.ts",
   "scripts": {
+    "startNodemon": "nodemon ./dist/app.js",
     "start": "tsx watch app.ts",
-    "build": "rm -rf dist/ && tsc && cp package.json ./dist/",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

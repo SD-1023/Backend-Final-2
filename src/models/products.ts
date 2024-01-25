@@ -4,6 +4,8 @@ import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
 import { CategoriesModel } from "./categories";
+import { UsersModel } from "./users";
+import { OrdersModel } from "./orders";
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -57,10 +59,6 @@ export const ProductsModel = sequelize.define("products", {
   },
 });
 
-CategoriesModel.hasMany(ProductsModel, {
-  foreignKey: "Category__Id",
-  as: "products",
-});
 ProductsModel.belongsTo(CategoriesModel, {
   foreignKey: "Category__Id",
   as: "productsCategory",
@@ -71,7 +69,12 @@ ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
 
-sequelize.sync({ alter: true });
+
+UsersModel.hasMany(OrdersModel,{foreignKey:"user_id"});
+
+OrdersModel.belongsTo(UsersModel,{foreignKey:"user_id"});
+//sequelize.sync({ alter: true });
+
 
 // const fillingReviewsTables = async () => {
 //   await ReviewsModel.sync({ force: false });

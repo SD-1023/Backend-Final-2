@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.get("/:id",addressesController.getAddressByUserId);
 router.post("/",addressesController.createNewAddress);
-router.put("/",addressesController.updateAddress);
+router.put("/:id",addressesController.updateAddress);
 
 export default router;

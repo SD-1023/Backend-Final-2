@@ -79,11 +79,18 @@ export const getAllProducts = async (req: Request, res: Response) => {
     let sort: any = req.query.sort;
     if (
       sort &&
-      (sort == "-name" || sort == "name" || sort == "price" || sort == "-price")
+      (sort == "-name" || sort == "name" || sort == "price" || sort == "-price" || sort=="stars" || sort=="-stars")
     ) {
       let dir;
       sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
-      sort = [[`${sort.replace("-", "")}`, dir]];
+      if(!sort.includes("stars"))
+      {
+        sort = [[`${sort.replace("-","")}`, dir]];
+      }
+
+      if(sort == "stars" || sort =="-stars") {
+        sort = [[`averageStars`, dir]];
+      };
     } else {
       sort = [["id", "ASC"]];
     }
@@ -130,9 +137,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "success", count, page, limit, products });
   } catch (error) {
+    console.log(error)
     return res.sendStatus(500);
   }
 };
+
 
 export const getNewArrivals = async (req: Request, res: Response) => {
   try {
@@ -167,7 +176,7 @@ export const getProductById = async (req: Request, res: Response) => {
           model: ProductsImagesModel,
         },
       ],
-      order: [[ProductsImagesModel, "isMain", "DESC"]],
+      order:[[ProductsImagesModel,"isMain","DESC"],[ProductsImagesModel,"id","ASC"]]
     });
 
     let [[{ avgRate }]]: any = await sequelize.query(

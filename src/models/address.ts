@@ -39,5 +39,4 @@ export const AddressModel = sequelize.define('addresses', {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-  });
-
+});

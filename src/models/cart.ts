@@ -13,7 +13,7 @@ export const CartsModel = sequelize.define('cart', {
     allowNull:false,
   },
   product_id:{
-    type:DataTypes.STRING(40),
+    type:DataTypes.INTEGER,
     allowNull:false,
   },
   product_price: {
@@ -30,6 +30,5 @@ export const CartsModel = sequelize.define('cart', {
   },
 },{
   freezeTableName:true,
-        timestamps: false,
-
+  timestamps: false,
 });

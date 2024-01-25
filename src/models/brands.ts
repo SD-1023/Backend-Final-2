@@ -13,7 +13,7 @@ export const BrandsModel = sequelize.define(
       allowNull: false,
     },
     image_secure_url: {
-      type: DataTypes.STRING(128),
+      type: DataTypes.STRING(256),
       allowNull: true,
     },
   },
