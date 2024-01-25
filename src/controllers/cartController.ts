@@ -13,7 +13,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
       const carts = await CartsModel.findAll({ where: { user_id: userId } });
   
       if (!carts || carts.length === 0) {
-        return res.status(404).json({ error: 'No cart entries found for the specified user ID' });
+        return res.status(400).json({ error: 'No cart entries found for the specified user ID' });
       }
         const cartItems = [];
       for (const cart of carts) {
@@ -70,7 +70,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
         const product = await ProductsModel.findOne({ where: { id: product_id } });
   
         if (!product) {
-          return res.status(404).json({ error: 'Product not found for the specified product ID' });
+          return res.status(400).json({ error: 'Product not found for the specified product ID' });
         }
   
         const product_name: string = product.get('name') as string;
@@ -106,7 +106,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
       });
   
       if (!cart) {
-        return res.status(404).json({ error: 'Product not found in the user\'s cart' });
+        return res.status(2).json({ error: 'Product not found in the user\'s cart' });
       }
   
       await CartsModel.destroy({

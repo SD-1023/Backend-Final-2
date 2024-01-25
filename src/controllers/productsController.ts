@@ -77,7 +77,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
       sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
       if(!sort.includes("stars"))
       {
-        console.log("first <============================================")
         sort = [[`${sort.replace("-","")}`, dir]];
       }
 

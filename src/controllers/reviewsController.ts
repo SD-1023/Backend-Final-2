@@ -104,7 +104,7 @@ export const deleteReview = async (req:Request,res:Response) =>{
     if(deletedReview == 1 ){
       return res.status(202).json({message:"success"});
     }else{
-      return res.sendStatus(404);
+      return res.sendStatus(400);
     }
     
   }catch(error){
