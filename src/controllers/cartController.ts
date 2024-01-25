@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CartsModel } from "../models/cart";
 import { ProductsModel } from "../models/products";
-import { cartsSchema } from "../validators/validations";
+import { addToCartSchema, cartsSchema } from "../validators/validations";
 import { cart } from "../types";
 
 export const getCartByUserId = async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
 
 export const addToCart = async (req: Request, res: Response) => {
   try {
-    const { error } = cartsSchema.validate(req.body);
+    const { error } = addToCartSchema.validate(req.body);
 
     if (error) {
       return res.status(400).json({ error: error.details[0].message });

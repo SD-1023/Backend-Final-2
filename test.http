@@ -3,7 +3,17 @@ http://localhost:3000/faker/cat
 
 
 ### gET
-GET http://localhost:3000/cart/23
+GET http://localhost:3000/cart/3
+
+###
+POST http://localhost:3000/cart/
+Content-Type: application/json
+
+{
+  "userId": "3",
+  "quantity": "5",
+  "product_id": "600"
+}
 
 ###
 POST http://localhost:3000/faker/generate-brands
@@ -28,19 +38,19 @@ Content-Type: application/json
 
 {
   "email": "marwan1@test.com",
-  "password": "1212124"
+  "password": "123123"
 }
 
 ### Sign Out
 PUT http://localhost:3000/users/signout
-Authorization: b292e5f8-5f29-4c56-a27f-5c8004316c09
+Authorization: 08ccb5b7-9ba8-4f0d-83c4-1f31e89808c9
 
 ### Change Password
 PUT http://localhost:3000/users/changePassword
-Authorization: f5f1b1d5-ae28-4de8-ab87-498891e360a5
+Authorization: 4cf38c4f-d678-40ca-b395-18fb6de35e80
 Content-Type: application/json
 
 {
-  "currentPassword": "1212124",
+  "currentPassword": "123123",
   "newPassword": "1212124"
 }
