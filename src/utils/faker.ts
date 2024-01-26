@@ -74,6 +74,8 @@ const generateRandomData = () => {
     user_id: faker.number.int({ min: 1, max: 100 }),
     quantity: faker.number.int({ min: 1, max: 10 }),
     product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
+    final_Price: faker.number.float({ min: 10, max: 500, precision: 2 }),
+
   });
   
   const randomOrderProduct = () => ({

@@ -73,16 +73,17 @@ export const addToCart = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Product not found for the specified product ID' });
       }
 
+      const finalPrice = parseFloat(product.get('finalPrice') as string);
       const product_name: string = product.get('name') as string;
-      const finalPrice: number = parseFloat(product.get('finalPrice') as string);
-
+      const product_price: number = parseFloat(product.get('price') as string);
+      
       cart = await CartsModel.create({
         user_id: userId,
         product_id,
-        product_name,
-        finalPrice,
+        product_name: product_name,
+        finalPrice: finalPrice,
         quantity,
-        product_price: finalPrice,
+        product_price: product_price,
       });
     }
 
