@@ -128,37 +128,40 @@ export const addOrder = async(req: Request,res: Response)=>{
             }
         })
 
-        let productArr : any = [];
-        let productInCartArr : any = [];
-        for(let i = 0;i < cartItems.length;i++){
-            // this ensures that in productArr[0] is the same the product in cart of productInCartArr[0] and so on.
-            const product = await ProductsModel.findByPk(cartItems[i].product_id);
-            const cartItemWithSameId = cartItems.find((prod : any)=> prod.product_id == cartItems[i].product_id);
-            
-            productArr.push(product);
-            productInCartArr.push(cartItemWithSameId);
-            if(cartItemWithSameId.dataValues.quantity > product?.dataValues.quantity){
-                return res.status(400).json({error:`There is no such quantity available for product name : ${product?.dataValues.name}`});
-            }
-        }
-
         let createTransaction : Transaction = await sequelize.transaction();
         transactionPasser = createTransaction;
-
-        // ! Ask about locks here, as they not applying
-        for(let i =0;i < productArr.length; i++){
-            const updatingQuantities = await ProductsModel.update({
-                quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.unit_quantity
-                
-            },{
-                where:{
-                    id:productArr[i]?.dataValues.id
-                    
-                },transaction:createTransaction
-            })
-        }
-        // * The Update code still under testing.
         
+        // let productArr : any = [];
+        // let productInCartArr : any = [];
+        // for(let i = 0;i < cartItems.length;i++){
+        //     // this ensures that in productArr[0] is the same the product in cart of productInCartArr[0] and so on.
+        //     const product = await ProductsModel.findByPk(cartItems[i].product_id);
+        //     const cartItemWithSameId = cartItems.find((prod : any)=> prod.product_id == cartItems[i].product_id);
+            
+        //     productArr.push(product);
+        //     productInCartArr.push(cartItemWithSameId);
+        //     if(cartItemWithSameId.dataValues.quantity > product?.dataValues.quantity){
+        //         return res.status(400).json({error:`There is no such quantity available for product name : ${product?.dataValues.name}`});
+        //     }
+        // }
+
+        // let createTransaction : Transaction = await sequelize.transaction();
+        // transactionPasser = createTransaction;
+
+        // // ! Ask about locks here, as they not applying
+        // for(let i =0;i < productArr.length; i++){
+        //     const updatingQuantities = await ProductsModel.update({
+        //         quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.unit_quantity
+                
+        //     },{
+        //         where:{
+        //             id:productArr[i]?.dataValues.id
+                    
+        //         },transaction:createTransaction
+        //     })
+        // }
+        // * The Update code still under testing.
+
         const userAddress = await AddressModel.findOne({
             where:{
                 user_id:id
