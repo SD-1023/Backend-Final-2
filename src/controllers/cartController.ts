@@ -65,13 +65,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
 
 
 export const addToCart = async (req: Request, res: Response) => {
-  try {
-    const { error } = cartsSchema.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
-
+  try{
     const { userId, quantity, product_id } = req.body;
 
     let cart = await CartsModel.findOne({ where: { user_id: userId, product_id } });
@@ -98,15 +92,17 @@ export const addToCart = async (req: Request, res: Response) => {
 
       }
 
+      const finalPrice = parseFloat(product.get('finalPrice') as string);
       const product_name: string = product.get('name') as string;
-      const finalPrice: number = parseFloat(product.get('finalPrice') as string);
+      const product_price: number = parseFloat(product.get('price') as string);
 
       cart = await CartsModel.create({
         user_id: userId,
         product_id,
-        product_name,
-        finalPrice,
+        product_name: product_name,
+        final_price : finalPrice,
         quantity,
+        product_price: product_price,
       });
     }
 
