@@ -20,6 +20,10 @@ export const CartsModel = sequelize.define('cart', {
     type:DataTypes.DECIMAL(10,0),
     allowNull:false
   },
+  final_price :{
+    type:DataTypes.DECIMAL(10,0),
+  },
+  
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
