@@ -106,7 +106,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
       });
   
       if (!cart) {
-        return res.status(2).json({ error: 'Product not found in the user\'s cart' });
+        return res.status(400).json({ error: 'Product not found in the user\'s cart' });
       }
   
       await CartsModel.destroy({
