@@ -31,15 +31,15 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/faker", fakerRoutes);
-// app.use("/products", productsRoutes);
-// app.use("/reviews", reviewsRoutes);
-// app.use("/categories", categoriesRoutes);
-// app.use("/wishlist", wishlistRoutes);
-// app.use("/users", usersRoutes);
+app.use("/products", productsRoutes);
+app.use("/reviews", reviewsRoutes);
+app.use("/categories", categoriesRoutes);
+app.use("/wishlist", wishlistRoutes);
+app.use("/users", usersRoutes);
 app.use("/cart", cartRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/addresses", addressesRoutes);
-// app.use("/productsImages", productsImagesRoutes);
+app.use("/productsImages", productsImagesRoutes);
 app.use("/brands", brandsRoutes);
 
 const PORT = 3000;

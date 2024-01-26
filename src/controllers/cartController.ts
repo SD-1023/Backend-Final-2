@@ -55,13 +55,7 @@ export const getCartByUserId = async (req: Request, res: Response) => {
 
 
 export const addToCart = async (req: Request, res: Response) => {
-  try {
-    const { error } = cartsSchema.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
-
+  try{
     const { userId, quantity, product_id } = req.body;
 
     let cart = await CartsModel.findOne({ where: { user_id: userId, product_id } });
@@ -88,6 +82,7 @@ export const addToCart = async (req: Request, res: Response) => {
         product_name,
         finalPrice,
         quantity,
+        product_price: finalPrice,
       });
     }
 
