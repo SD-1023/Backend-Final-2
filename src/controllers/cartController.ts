@@ -88,12 +88,13 @@ export const addToCart = async (req: Request, res: Response) => {
       });
   
       if (!cart) {
-        return res.status(2).json({ error: 'Product not found in the user\'s cart' });
+        return res.status(400).json({ error: 'Product not found in the user\'s cart' });
     } else {
       const product = await ProductsModel.findOne({ where: { id: product_id } });
 
       if (!product) {
         return res.status(404).json({ error: 'Product not found for the specified product ID' });
+
 
       }
 

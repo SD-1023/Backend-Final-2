@@ -12,12 +12,10 @@ export const UsersModel = sequelize.define('users', {
   username: {
     type: DataTypes.STRING(50),
     allowNull: false,
-    unique: true,
   },
   email: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    unique: true,
   },
   password: {
     type: DataTypes.STRING(100),
