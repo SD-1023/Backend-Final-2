@@ -138,7 +138,7 @@ export const signIn = async (req: Request, res: Response) => {
       userId: user.id,
     })) as unknown as Session;
 
-    res.json({ message: "Sign in successful", sessionId });
+    res.json({ message: "success", sessionId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -166,7 +166,7 @@ export const signOut = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Session ID not found" });
     }
 
-    res.json({ message: "Sign out successful" });
+    res.json({ message: "success" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -221,7 +221,7 @@ export const changePassword = async (req: Request, res: Response) => {
 
     if (updatedRow > 0) {
       await SessionsModel.destroy({ where: { userId } });
-      return res.status(200).json({ message: "Password updated successfully" });
+      return res.status(200).json({ message: "success" });
     } else {
       return res.status(404).json({ message: "User not found" });
     }

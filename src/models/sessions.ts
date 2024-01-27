@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
-import { UsersModel } from "./users";
 
 export const SessionsModel = sequelize.define(
   "sessions",
@@ -12,4 +11,3 @@ export const SessionsModel = sequelize.define(
   }
 );
 
-SessionsModel.belongsTo(UsersModel, { foreignKey: "userId" });
