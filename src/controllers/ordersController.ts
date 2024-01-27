@@ -1,6 +1,6 @@
 import { ProductsModel } from './../models/products';
 import { OrdersItemsModel } from './../models/ordersItems';
-import { Transaction } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { sequelize } from './../config/database';
 import { CartsModel } from './../models/cart';
 import { AddressModel } from './../models/address';
@@ -134,7 +134,7 @@ export const addOrder = async(req: Request,res: Response)=>{
 
         let createTransaction : Transaction = await sequelize.transaction();
         transactionPasser = createTransaction;
-        
+
         let productArr : any = [];
         let productInCartArr : any = [];
         for(let i = 0;i < cartItems.length;i++){
@@ -150,9 +150,10 @@ export const addOrder = async(req: Request,res: Response)=>{
             }
         }
 
+        
         for(let i =0;i < productArr.length; i++){
             const updatingQuantities = await ProductsModel.update({
-                quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.unit_quantity
+                quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.quantity
                 
             },{
                 where:{
@@ -160,7 +161,13 @@ export const addOrder = async(req: Request,res: Response)=>{
                     
                 },transaction:createTransaction
             })
+
+            if(updatingQuantities[0] == 0){
+                await createTransaction.rollback();
+                return res.status(400).json({error:"Some products were not updated"});
+            }
         }
+        
 
         const userAddress = await AddressModel.findOne({
             where:{
@@ -203,6 +210,7 @@ export const addOrder = async(req: Request,res: Response)=>{
                 return res.status(400).json({error:"Order items were not created"});
             }
 
+
         newOrder.dataValues.ordersItems = [...ordersList];
             console.log(ordersList);
         await createTransaction.commit();
@@ -215,6 +223,7 @@ export const addOrder = async(req: Request,res: Response)=>{
 }
 
 export const cancelOrder = async(req: Request,res: Response)=>{
+    let transactionPasser : any;
     try{
         const id = Number(req.params.id);
         if(Number.isNaN(id)){
@@ -228,6 +237,8 @@ export const cancelOrder = async(req: Request,res: Response)=>{
         if(order == null){
             return res.status(400).json({error:"order was not found"})
         }
+        let updatingQuantitiesTransaction : Transaction = await sequelize.transaction();
+        transactionPasser = updatingQuantitiesTransaction;
 
         const cancelAllOrdersForUser = await OrdersModel.update({
             status:"cancelled",
@@ -235,7 +246,7 @@ export const cancelOrder = async(req: Request,res: Response)=>{
         {
             where: {
                 id:id,
-            }
+            },transaction:updatingQuantitiesTransaction,
         })
 
         if(cancelAllOrdersForUser[0] == 0){
@@ -243,9 +254,32 @@ export const cancelOrder = async(req: Request,res: Response)=>{
             return res.sendStatus(204);
         }
 
+        let orderItems = await OrdersItemsModel.findAll({
+            where:{
+                order_Id:id,
+            }
+        })
+        console.log(orderItems,"orderITems");
+
+        for(let i=0;i<orderItems.length ; i++){
+            let restoringProductQuantity = await ProductsModel.update({
+                quantity:Sequelize.literal(`quantity + ${orderItems[i].dataValues.unit_quantity}`),
+            },{
+                where:{
+                    id:orderItems[i].dataValues.product_id
+                }
+            })
+
+            if(restoringProductQuantity[0] == 0){
+                await updatingQuantitiesTransaction.rollback();
+                return res.status(400).json({error:"Product was not updated"})
+            }
+        }
+
         return res.status(400).json({message:"success"});
 
     }catch(error){
+        await transactionPasser?.rollback();
         console.log(error);
         return res.status(500).json({error})
     }
