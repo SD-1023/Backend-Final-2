@@ -8,7 +8,7 @@ import { ReviewsModel } from "../models/reviews";
 import { CategoriesModel } from "../models/categories";
 import { UsersModel } from "../models/users";
 import { OrdersModel } from "../models/orders";
-import {OrderProducts} from "../models/orderProducts"
+
 const generateRandomData = () => {
   const randomProducts = () => ({
     name: faker.commerce.productName(),
@@ -84,8 +84,8 @@ const generateRandomData = () => {
     user_id: faker.number.int({ min: 1, max: 100 }),
     quantity: faker.number.int({ min: 1, max: 10 }),
     product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
-    final_Price: faker.number.float({ min: 10, max: 500, precision: 2 }),
-
+    finalPrice: faker.number.float({ min: 10, max: 500, precision: 2 }),
+    image_secure_url:faker.image.urlPicsumPhotos(),
   });
   
   const randomOrderProduct = () => ({
@@ -118,18 +118,6 @@ export const fillTables = async () => {
 
   console.log(`Products were created successfully`);
 };
-
-
-export const fillTablesOrderProducts = async () => {
-  const { randomOrderProduct } = generateRandomData();
-
-  for (let i = 0; i < 100; i++) {
-    const random = randomOrderProduct();
-    await OrderProducts.create(random);
-    console.log(`ITERATION ==========> ${i} <================`);
-  }
-};
-
 
 export const fillTablesReviews = async () => {
   const { randomReviews } = generateRandomData();
