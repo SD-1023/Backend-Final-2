@@ -1,7 +1,7 @@
-import { OrdersItemsModel } from './../models/ordersItems';
-import { CartsModel } from '../models/cart';
-import { AddressModel } from '../models/address';
-import { WishlistsModel } from '../models/wishlist';
+import { OrdersItemsModel } from "./../models/ordersItems";
+import { CartsModel } from "../models/cart";
+import { AddressModel } from "../models/address";
+import { WishlistsModel } from "../models/wishlist";
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -43,22 +43,22 @@ const generateRandomData = () => {
     user_id: faker.number.int({ min: 1, max: 100 }),
     discount: faker.number.int({ min: 1, max: 150 }),
     deliveryFee: faker.number.float({ min: 0, max: 15, precision: 2 }),
-    street:faker.location.street(),
+    street: faker.location.street(),
     status: faker.helpers.arrayElement(["pending", "delivered", "cancelled"]),
-    city:faker.location.city(),
-    country:faker.location.country(),
-    mobile_number:faker.phone.number()
+    city: faker.location.city(),
+    country: faker.location.country(),
+    mobile_number: faker.phone.number(),
   });
 
-   const randomOrdersItems = () =>({
+  const randomOrdersItems = () => ({
     product_id: faker.number.int({ min: 1, max: 100 }),
     rating: faker.number.float({ min: 0, max: 5, precision: 2 }),
-    unit_quantity:faker.number.int({min:1 , max:20}),
-    unit_price:faker.number.float({min:10.00,max:150.00,precision:2}),
-    discount:faker.number.float({min:0.00,max:20.00,precision:2}),
-    order_Id:faker.number.int({min:0,max:100}),
-    deliveryFee:faker.number.int({min:0,max:20}),
-   })
+    unit_quantity: faker.number.int({ min: 1, max: 20 }),
+    unit_price: faker.number.float({ min: 10.0, max: 150.0, precision: 2 }),
+    discount: faker.number.float({ min: 0.0, max: 20.0, precision: 2 }),
+    order_Id: faker.number.int({ min: 0, max: 100 }),
+    deliveryFee: faker.number.int({ min: 0, max: 20 }),
+  });
 
   const randomWishLists = () => ({
     user_id: faker.number.int({ min: 1, max: 50 }),
@@ -84,7 +84,7 @@ const generateRandomData = () => {
     quantity: faker.number.int({ min: 1, max: 10 }),
     product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
     finalPrice: faker.number.float({ min: 10, max: 500, precision: 2 }),
-    image_secure_url:faker.image.urlPicsumPhotos(),
+    image_secure_url: faker.image.urlPicsumPhotos(),
   });
 
   const randomOrderProduct = () => ({
@@ -163,15 +163,15 @@ export const fillingTablesOrders = async () => {
   }
 };
 
-export const fillingTablesWithOrdersItems = async () =>{
+export const fillingTablesWithOrdersItems = async () => {
   const { randomOrdersItems } = generateRandomData();
 
-  for (let i = 0; i < 200 ; i++) {
+  for (let i = 0; i < 200; i++) {
     const randomOrdersItem = randomOrdersItems();
     await OrdersItemsModel.create(randomOrdersItem);
     console.log(`ITERATION ==========> ${i} <================`);
   }
-}
+};
 
 export const filingTablesWishLists = async () => {
   const { randomWishLists } = generateRandomData();

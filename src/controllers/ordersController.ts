@@ -1,6 +1,6 @@
 import { ProductsModel } from './../models/products';
 import { OrdersItemsModel } from './../models/ordersItems';
-import { Transaction } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { sequelize } from './../config/database';
 import { CartsModel } from './../models/cart';
 import { AddressModel } from './../models/address';
@@ -128,45 +128,57 @@ export const addOrder = async(req: Request,res: Response)=>{
             }
         })
 
+        if(cartItems.length == 0 ){
+            return res.status(400).json({error:"You cant order an empty cart"});
+        }
+
         let createTransaction : Transaction = await sequelize.transaction();
         transactionPasser = createTransaction;
-        
-        // let productArr : any = [];
-        // let productInCartArr : any = [];
-        // for(let i = 0;i < cartItems.length;i++){
-        //     // this ensures that in productArr[0] is the same the product in cart of productInCartArr[0] and so on.
-        //     const product = await ProductsModel.findByPk(cartItems[i].product_id);
-        //     const cartItemWithSameId = cartItems.find((prod : any)=> prod.product_id == cartItems[i].product_id);
+
+        let productArr : any = [];
+        let productInCartArr : any = [];
+        for(let i = 0;i < cartItems.length;i++){
+            // this ensures that in productArr[0] is the same the product in cart of productInCartArr[0] and so on.
+            const product = await ProductsModel.findByPk(cartItems[i].product_id,{lock:true});
+            const cartItemWithSameId = cartItems.find((prod : any)=> prod.product_id == cartItems[i].product_id);
+
+            productArr.push(product);
+            productInCartArr.push(cartItemWithSameId);
             
-        //     productArr.push(product);
-        //     productInCartArr.push(cartItemWithSameId);
-        //     if(cartItemWithSameId.dataValues.quantity > product?.dataValues.quantity){
-        //         return res.status(400).json({error:`There is no such quantity available for product name : ${product?.dataValues.name}`});
-        //     }
-        // }
+            if(cartItemWithSameId.dataValues.quantity > product?.dataValues.quantity){
+                return res.status(400).json({error:`There is no such quantity available for product name : ${product?.dataValues.name}`});
+            }
+        }
 
-        // let createTransaction : Transaction = await sequelize.transaction();
-        // transactionPasser = createTransaction;
-
-        // // ! Ask about locks here, as they not applying
-        // for(let i =0;i < productArr.length; i++){
-        //     const updatingQuantities = await ProductsModel.update({
-        //         quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.unit_quantity
+        
+        for(let i =0;i < productArr.length; i++){
+            const updatingQuantities = await ProductsModel.update({
+                quantity:productArr[i].dataValues.quantity - productInCartArr[i].dataValues.quantity
                 
-        //     },{
-        //         where:{
-        //             id:productArr[i]?.dataValues.id
+            },{
+                where:{
+                    id:productArr[i]?.dataValues.id
                     
-        //         },transaction:createTransaction
-        //     })
-        // }
-        // * The Update code still under testing.
+                },transaction:createTransaction
+            })
+
+            if(updatingQuantities[0] == 0){
+                await createTransaction.rollback();
+                return res.status(400).json({error:"Some products were not updated"});
+            }
+        }
+        
 
         const userAddress = await AddressModel.findOne({
             where:{
                 user_id:id
             }
         })
+        if(userAddress == null){
+            await createTransaction.rollback();
+            return res.status(400).json({error:"user cant send order without an address"});
+        }
+
         const ordersList : any = [];
     
             const newOrder = await OrdersModel.create({
@@ -178,22 +190,29 @@ export const addOrder = async(req: Request,res: Response)=>{
 
             },{ transaction : createTransaction });
             
-            for(let i = 0 ; i < cartItems.length - 1 ; i++){
+            
+            for(let j = 0 ; j < cartItems.length ; j++){
                 const newOrderItems = await OrdersItemsModel.create({
                     order_Id:newOrder.dataValues.id,
-                    product_id:cartItems[i].dataValues.product_id,
-                    unit_price:Number(cartItems[i].dataValues.product_price),
-                    unit_quantity:cartItems[i].dataValues.quantity,
+                    product_id:cartItems[j].dataValues.product_id,
+                    unit_price:Number(cartItems[j].dataValues.finalPrice),
+                    unit_quantity:cartItems[j].dataValues.quantity,
                     discount:10,
                     deliveryFee:0,
 
-            },{ transaction : createTransaction });
+                },{ transaction : createTransaction });
 
-            await ordersList.push(newOrderItems);
-        }
+                ordersList.push(newOrderItems);
+            }
+
+            if(ordersList.length == 0 ){
+                await createTransaction.rollback();
+                return res.status(400).json({error:"Order items were not created"});
+            }
+
 
         newOrder.dataValues.ordersItems = [...ordersList];
-
+            console.log(ordersList);
         await createTransaction.commit();
         return res.status(201).json({message:"success",order:newOrder});
     }catch(error){
@@ -204,6 +223,7 @@ export const addOrder = async(req: Request,res: Response)=>{
 }
 
 export const cancelOrder = async(req: Request,res: Response)=>{
+    let transactionPasser : any;
     try{
         const id = Number(req.params.id);
         if(Number.isNaN(id)){
@@ -214,14 +234,19 @@ export const cancelOrder = async(req: Request,res: Response)=>{
         if(order?.dataValues.status == "delivered"){
             return res.status(400).json({error:"This order was already fulfilled"});
         }
+        if(order == null){
+            return res.status(400).json({error:"order was not found"})
+        }
+        let updatingQuantitiesTransaction : Transaction = await sequelize.transaction();
+        transactionPasser = updatingQuantitiesTransaction;
 
         const cancelAllOrdersForUser = await OrdersModel.update({
             status:"cancelled",
         },
         {
             where: {
-                user_id:id,
-            }
+                id:id,
+            },transaction:updatingQuantitiesTransaction,
         })
 
         if(cancelAllOrdersForUser[0] == 0){
@@ -229,9 +254,32 @@ export const cancelOrder = async(req: Request,res: Response)=>{
             return res.sendStatus(204);
         }
 
+        let orderItems = await OrdersItemsModel.findAll({
+            where:{
+                order_Id:id,
+            }
+        })
+        console.log(orderItems,"orderITems");
+
+        for(let i=0;i<orderItems.length ; i++){
+            let restoringProductQuantity = await ProductsModel.update({
+                quantity:Sequelize.literal(`quantity + ${orderItems[i].dataValues.unit_quantity}`),
+            },{
+                where:{
+                    id:orderItems[i].dataValues.product_id
+                }
+            })
+
+            if(restoringProductQuantity[0] == 0){
+                await updatingQuantitiesTransaction.rollback();
+                return res.status(400).json({error:"Product was not updated"})
+            }
+        }
+
         return res.status(400).json({message:"success"});
 
     }catch(error){
+        await transactionPasser?.rollback();
         console.log(error);
         return res.status(500).json({error})
     }

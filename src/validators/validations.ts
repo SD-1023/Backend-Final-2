@@ -54,6 +54,12 @@ export const cartItemSchema = Joi.object({
   productId: Joi.number().integer().min(0),
 });
 
+export const addToCartSchema = Joi.object({
+  productId: Joi.number().integer().min(0),
+  userId: Joi.number().integer().min(0),
+  quantity: Joi.number().integer().min(0),
+});
+
 export const addresssSchema = Joi.object({
   street: Joi.string().max(128).required(),
   city: Joi.string().max(64).required(),
@@ -81,12 +87,6 @@ export const cartsSchema = Joi.object({
   product_id: Joi.string().max(40).required(),
   product_price: Joi.number().precision(6).min(0).required(),
   user_id: Joi.number().integer().required(),
-  quantity: Joi.number().integer().required(),
-});
-
-export const addToCartSchema = Joi.object({
-  product_id: Joi.string().max(40).required(),
-  userId: Joi.number().integer().required(),
   quantity: Joi.number().integer().required(),
 });
 

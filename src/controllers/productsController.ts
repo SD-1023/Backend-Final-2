@@ -131,7 +131,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       limit: Number(limit),
       offset: (page - 1) * limit,
     });
-
+    
     const count = await ProductsModel.count({ where: conditions });
     return res
       .status(200)
