@@ -11,6 +11,7 @@ import cartRoutes from "./routes/cart";
 import ordersRoutes from "./routes/orders";
 import addressesRoutes from "./routes/addresses";
 import productsImagesRoutes from "./routes/productsImagesRoutes";
+import "./models/associations"
 import FakerRoute from "./routes/fakerRoutes";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
