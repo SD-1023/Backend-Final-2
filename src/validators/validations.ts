@@ -49,13 +49,32 @@ export const productValidatorForUpdate = Joi.object({
   imageUrl: Joi.string().uri(),
 });
 
+export const cartItemSchema = Joi.object({
+  userId: Joi.number().integer().min(0),
+  productId: Joi.number().integer().min(0),
+});
+
 export const addresssSchema = Joi.object({
   street: Joi.string().max(128).required(),
   city: Joi.string().max(64).required(),
   state: Joi.string().max(64).required(),
   postal_code: Joi.string().max(20).required(),
   country: Joi.string().max(64).required(),
-  user_id: Joi.number().integer().required(),
+  userId: Joi.number().integer().min(0).required(),
+  countryCallingCode: Joi.string().max(10).required(),
+  mobileNumber: Joi.string().max(32),
+  FullName: Joi.string().max(64).required(),
+});
+
+export const updateAddressSchema = Joi.object({
+  newStreet: Joi.string().max(128),
+  newCity: Joi.string().max(64),
+  newState: Joi.string().max(64),
+  newPostal_code: Joi.string().max(20),
+  newCountry: Joi.string().max(64),
+  newCountryCallingCode: Joi.string().max(10),
+  newMobileNumber: Joi.string().max(32),
+  newFullName: Joi.string().max(64),
 });
 export const cartsSchema = Joi.object({
   product_name: Joi.string().max(40).required(),

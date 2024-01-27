@@ -1,13 +1,13 @@
-import { CartsModel } from "../models/cart";
-import { AddressModel } from "../models/address";
-import { WishlistsModel } from "../models/wishlist";
+import { OrdersItemsModel } from './../models/ordersItems';
+import { CartsModel } from '../models/cart';
+import { AddressModel } from '../models/address';
+import { WishlistsModel } from '../models/wishlist';
 import { faker } from "@faker-js/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
 import { CategoriesModel } from "../models/categories";
 import { UsersModel } from "../models/users";
 import { OrdersModel } from "../models/orders";
-import { OrderProducts } from "../models/orderProducts";
 const generateRandomData = () => {
   const randomProducts = () => ({
     name: faker.commerce.productName(),
@@ -42,13 +42,23 @@ const generateRandomData = () => {
   const randomOrders = () => ({
     user_id: faker.number.int({ min: 1, max: 100 }),
     discount: faker.number.int({ min: 1, max: 150 }),
-    rating: faker.number.float({ min: 0, max: 5, precision: 2 }),
     deliveryFee: faker.number.float({ min: 0, max: 15, precision: 2 }),
-    subTotal: faker.number.float({ min: 200, max: 600, precision: 2 }),
+    street:faker.location.street(),
     status: faker.helpers.arrayElement(["pending", "delivered", "cancelled"]),
-    grandTotal: faker.number.float({ min: 400, max: 700, precision: 2 }),
-    address_id: faker.number.int({ min: 1, max: 100 }),
+    city:faker.location.city(),
+    country:faker.location.country(),
+    mobile_number:faker.phone.number()
   });
+
+   const randomOrdersItems = () =>({
+    product_id: faker.number.int({ min: 1, max: 100 }),
+    rating: faker.number.float({ min: 0, max: 5, precision: 2 }),
+    unit_quantity:faker.number.int({min:1 , max:20}),
+    unit_price:faker.number.float({min:10.00,max:150.00,precision:2}),
+    discount:faker.number.float({min:0.00,max:20.00,precision:2}),
+    order_Id:faker.number.int({min:0,max:100}),
+    deliveryFee:faker.number.int({min:0,max:20}),
+   })
 
   const randomWishLists = () => ({
     user_id: faker.number.int({ min: 1, max: 50 }),
@@ -73,6 +83,8 @@ const generateRandomData = () => {
     user_id: faker.number.int({ min: 1, max: 100 }),
     quantity: faker.number.int({ min: 1, max: 10 }),
     product_price: faker.number.float({ min: 10, max: 500, precision: 2 }),
+    finalPrice: faker.number.float({ min: 10, max: 500, precision: 2 }),
+    image_secure_url:faker.image.urlPicsumPhotos(),
   });
 
   const randomOrderProduct = () => ({
@@ -91,6 +103,7 @@ const generateRandomData = () => {
     randomCategories,
     randomUsers,
     randomOrders,
+    randomOrdersItems,
     randomWishLists,
     randomAddresses,
     randomCart,
@@ -108,16 +121,6 @@ export const fillTables = async () => {
   }
 
   console.log(`Products were created successfully`);
-};
-
-export const fillTablesOrderProducts = async () => {
-  const { randomOrderProduct } = generateRandomData();
-
-  for (let i = 0; i < 100; i++) {
-    const random = randomOrderProduct();
-    await OrderProducts.create(random);
-    console.log(`ITERATION ==========> ${i} <================`);
-  }
 };
 
 export const fillTablesReviews = async () => {
@@ -159,6 +162,16 @@ export const fillingTablesOrders = async () => {
     console.log(`ITERATION ==========> ${i} <================`);
   }
 };
+
+export const fillingTablesWithOrdersItems = async () =>{
+  const { randomOrdersItems } = generateRandomData();
+
+  for (let i = 0; i < 200 ; i++) {
+    const randomOrdersItem = randomOrdersItems();
+    await OrdersItemsModel.create(randomOrdersItem);
+    console.log(`ITERATION ==========> ${i} <================`);
+  }
+}
 
 export const filingTablesWishLists = async () => {
   const { randomWishLists } = generateRandomData();

@@ -10,7 +10,6 @@ import {
   filingTablesWishLists,
   fillingTablesAddresses,
   fillingTablesCart,
-  fillTablesOrderProducts,
 } from "../utils/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";
@@ -20,7 +19,6 @@ import { OrdersModel } from "../models/orders";
 import { CartsModel } from "../models/cart";
 import { WishlistsModel } from "../models/wishlist";
 import { AddressModel } from "../models/address";
-import { OrderProducts } from "../models/orderProducts";
 const router = express.Router();
 
 router.post("/generate-categories", async (req, res) => {
@@ -111,14 +109,4 @@ router.post("/generate-addresses", async (req, res) => {
   }
 });
 
-router.post("/generate-randomOrderProduct", async (req, res) => {
-  try {
-    await OrderProducts.sync({ force: true });
-    await fillTablesOrderProducts();
-    res.status(200).json({ message: "OrderProducts generated successfully" });
-  } catch (error) {
-    console.error("Error generating OrderProducts:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
 export default router;

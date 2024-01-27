@@ -17,6 +17,10 @@ export const CartsModel = sequelize.define('cart', {
     allowNull:false,
   },
   product_price: {
+    type:DataTypes.DECIMAL(10,0),
+    allowNull:false
+  },
+  finalPrice :{
     type:DataTypes.DECIMAL(6,2),
     allowNull:false
   },
@@ -28,6 +32,10 @@ export const CartsModel = sequelize.define('cart', {
     type:DataTypes.INTEGER,
     allowNull:false
   },
+  image_secure_url:{
+    type:DataTypes.STRING(256),
+    allowNull:false,
+  }
 },{
   freezeTableName:true,
   timestamps: false,
