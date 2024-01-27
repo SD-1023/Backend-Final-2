@@ -1,4 +1,4 @@
-import { fillingTablesOrders, fillingTablesWithOrdersItems } from './../utils/faker';
+import { fillingTablesCart, fillingTablesOrders, fillingTablesWithOrdersItems } from './../utils/faker';
 import { ProductsImagesModel } from "./productsImages";
 import { ReviewsModel } from "./reviews";
 import { DataTypes } from "sequelize";
@@ -8,6 +8,7 @@ import { CategoriesModel } from "./categories";
 import { UsersModel } from "./users";
 import { OrdersItemsModel } from "./ordersItems";
 import { OrdersModel } from './orders';
+import { CartsModel } from './cart';
 dotenv.config();
 
 export const ProductsModel = sequelize.define("products", {
@@ -56,21 +57,22 @@ export const ProductsModel = sequelize.define("products", {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
-  brand_id: {
-    type: DataTypes.INTEGER,
-  },
+});
+
+CategoriesModel.hasMany(ProductsModel, {
+  foreignKey: "Category__Id",
+  as: "products", 
 });
 
 ProductsModel.belongsTo(CategoriesModel, {
   foreignKey: "Category__Id",
-  as: "productsCategory",
+  as: "productsCategory", 
 });
 
 ProductsModel.hasMany(ReviewsModel, { foreignKey: "product_id" });
 ProductsModel.hasMany(ProductsImagesModel, { foreignKey: "product_id" });
 ProductsImagesModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
-ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });
-
+ReviewsModel.belongsTo(ProductsModel, { foreignKey: "product_id" });  
 
 UsersModel.hasMany(OrdersModel,{foreignKey:"user_id"});
 OrdersModel.belongsTo(UsersModel,{foreignKey:"user_id"});
@@ -78,7 +80,7 @@ OrdersModel.belongsTo(UsersModel,{foreignKey:"user_id"});
 OrdersItemsModel.belongsTo(OrdersModel,{foreignKey:"order_Id"});
 OrdersModel.hasMany(OrdersItemsModel,{foreignKey:"order_Id"});
 
-//sequelize.sync({ alter: true });
+sequelize.sync({ alter: true });
 
 
 
@@ -117,7 +119,7 @@ OrdersModel.hasMany(OrdersItemsModel,{foreignKey:"order_Id"});
 
 //*====================
 // const fillingTablesWithCarts_ = async () => {
-//   await CartsModel.sync({ force: false });
+//   await CartsModel.sync({ force: true });
 //   await fillingTablesCart();
 // };
 // fillingTablesWithCarts_();

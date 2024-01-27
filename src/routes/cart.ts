@@ -7,8 +7,8 @@ router.get("/:id",cartController.getCartByUserId);
 router.post("/",cartController.addToCart);
 router.delete("/",cartController.deleteFromCart);
 router.delete("/clear/:id",cartController.clearCart);
-router.post('/decreaseQuantity', cartController.decreaseQuantity);
-router.post('/increaseQuantity', cartController.increaseQuantity);
+router.put('/dec', cartController.decreaseQuantity);
+router.put('/inc', cartController.increaseQuantity);
 
 
 
