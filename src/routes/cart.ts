@@ -1,15 +1,14 @@
 import express from "express";
-import * as cartController from "../controllers/cartController"
+import * as cartController from "../controllers/cartController";
+import { authenticate } from "../middlewares/authenticate";
 
 const router = express.Router();
 
-router.get("/:id",cartController.getCartByUserId);
-router.post("/",cartController.addToCart);
-router.delete("/",cartController.deleteFromCart);
-router.delete("/clear/:id",cartController.clearCart);
-router.put('/dec', cartController.decreaseQuantity);
-router.put('/inc', cartController.increaseQuantity);
-
-
+router.get("/:id", cartController.getCartByUserId);
+router.post("/", authenticate, cartController.addToCart);
+router.delete("/", authenticate, cartController.deleteFromCart);
+router.delete("/clear/:id", authenticate, cartController.clearCart);
+router.put("/dec", authenticate, cartController.decreaseQuantity);
+router.put("/inc", authenticate, cartController.increaseQuantity);
 
 export default router;
