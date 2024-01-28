@@ -1,11 +1,14 @@
-import { deleteImgFromFileSystem } from './../config/fileSystem';
-import { productValidatorForUpdate } from './../validators/validations';
-import  imageThumbnail  from 'image-thumbnail';
+import { deleteImgFromFileSystem } from "./../config/fileSystem";
+import { productValidatorForUpdate } from "./../validators/validations";
+import imageThumbnail from "image-thumbnail";
 import { ProductsImagesModel } from "./../models/productsImages";
 import { Request, Response } from "express";
 import { ProductsModel } from "../models/products";
 import { Op, Transaction } from "sequelize";
-import { productValidator, uriImageLinkSchema } from "../validators/validations";
+import {
+  productValidator,
+  uriImageLinkSchema,
+} from "../validators/validations";
 import dotenv from "dotenv";
 import { applyFileSystem } from "../config/fileSystem";
 import { ReviewsModel } from "../models/reviews";
@@ -15,8 +18,13 @@ import cloudinary from "../config/fileSystem";
 dotenv.config();
 applyFileSystem();
 
-let thumbnailOptions : any = { width: 100, height: 100, fit:"inside", responseType: 'base64', jpegOptions: { force:true, quality:100 } };
-
+let thumbnailOptions: any = {
+  width: 100,
+  height: 100,
+  fit: "inside",
+  responseType: "base64",
+  jpegOptions: { force: true, quality: 100 },
+};
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -30,7 +38,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       limit = 9;
     }
 
-    const search  = req.query.search as string;
+    const search = req.query.search as string;
     let conditions: any = {};
 
     if (search) {
@@ -71,18 +79,22 @@ export const getAllProducts = async (req: Request, res: Response) => {
     let sort: any = req.query.sort;
     if (
       sort &&
-      (sort == "-name" || sort == "name" || sort == "price" || sort == "-price" || sort=="stars" || sort=="-stars")
+      (sort == "-name" ||
+        sort == "name" ||
+        sort == "price" ||
+        sort == "-price" ||
+        sort == "stars" ||
+        sort == "-stars")
     ) {
       let dir;
       sort.includes("-") ? (dir = "DESC") : (dir = "ASC");
-      if(!sort.includes("stars"))
-      {
-        sort = [[`${sort.replace("-","")}`, dir]];
+      if (!sort.includes("stars")) {
+        sort = [[`${sort.replace("-", "")}`, dir]];
       }
 
-      if(sort == "stars" || sort =="-stars") {
+      if (sort == "stars" || sort == "-stars") {
         sort = [[`averageStars`, dir]];
-      };
+      }
     } else {
       sort = [["id", "ASC"]];
     }
@@ -123,17 +135,16 @@ export const getAllProducts = async (req: Request, res: Response) => {
       limit: Number(limit),
       offset: (page - 1) * limit,
     });
-    
+
     const count = await ProductsModel.count({ where: conditions });
     return res
       .status(200)
       .json({ message: "success", count, page, limit, products });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.sendStatus(500);
   }
 };
-
 
 export const getNewArrivals = async (req: Request, res: Response) => {
   try {
@@ -168,7 +179,10 @@ export const getProductById = async (req: Request, res: Response) => {
           model: ProductsImagesModel,
         },
       ],
-      order:[[ProductsImagesModel,"isMain","DESC"],[ProductsImagesModel,"id","ASC"]]
+      order: [
+        [ProductsImagesModel, "isMain", "DESC"],
+        [ProductsImagesModel, "id", "ASC"],
+      ],
     });
 
     let [[{ avgRate }]]: any = await sequelize.query(
@@ -188,12 +202,12 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 export const createProduct = async (req: Request, res: Response) => {
-  let fullPictureImagePasser : any;
+  let fullPictureImagePasser: any;
   try {
     const newProduct = req.body;
     const { error, value: validatedNewProduct } =
       productValidator.validate(newProduct);
-      
+
     if (error) {
       return res.status(400).json({ error });
     }
@@ -205,83 +219,111 @@ export const createProduct = async (req: Request, res: Response) => {
     let base64Image = buffer.toString("base64");
 
     (async function run() {
-      const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
-        use_filename: true,
-        resource_type: "image",
-        folder: process.env.PRODUCTS_IMAGES_FOLDER_PATH,
-        transformation: [{ width: 1400, height: 1400, crop: "fit" }],
-      });
+      const result = await cloudinary.uploader.upload(
+        `data:image/png;base64,${base64Image}`,
+        {
+          use_filename: true,
+          resource_type: "image",
+          folder: process.env.PRODUCTS_IMAGES_FOLDER_PATH,
+          transformation: [{ width: 1400, height: 1400, crop: "fit" }],
+        }
+      );
       fullPictureImagePasser = result;
-      const {error} = uriImageLinkSchema.validate(result.secure_url)
-      if(error){
-        return res.status(500).json({error:"Image was not processed properly"})
+      const { error } = uriImageLinkSchema.validate(result.secure_url);
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Image was not processed properly" });
       }
 
       // * Transaction start
-      let t1 : Transaction = await sequelize.transaction()
+      let t1: Transaction = await sequelize.transaction();
       let passingImageThumbnailToCatchBlock;
-      try{
-        const insertNewProductToDB = await ProductsModel.create({
+      try {
+        const insertNewProductToDB = await ProductsModel.create(
+          {
             name: validatedNewProduct.name,
             category: validatedNewProduct.category,
             price: validatedNewProduct.price,
             description: validatedNewProduct.description,
             finalPrice: validatedNewProduct.finalPrice,
             Category__Id: validatedNewProduct.categoryId,
-            offer:validatedNewProduct.offer,
-            alt:validatedNewProduct.alt,
+            offer: validatedNewProduct.offer,
+            alt: validatedNewProduct.alt,
             quantity: validatedNewProduct.quantity,
             image_secure_url: result.secure_url,
-          },{transaction:t1});
+          },
+          { transaction: t1 }
+        );
 
-          let thumbnail = await imageThumbnail(`${base64Image}`,thumbnailOptions)
+        let thumbnail = await imageThumbnail(
+          `${base64Image}`,
+          thumbnailOptions
+        );
 
-          validatedNewProduct.image_secure_url = result.secure_url;
-            console.log(insertNewProductToDB)
-            let uploadedThumbnail = await cloudinary.uploader.upload(`data:image/png;base64,${thumbnail}`,{
-              use_filename: true,
-              resource_type:"image",
-              folder:process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
-            })
-            
-            passingImageThumbnailToCatchBlock = uploadedThumbnail;
-            console.log(uploadedThumbnail);
-            const {error : thumbnailFailed} = uriImageLinkSchema.validate(uploadedThumbnail.secure_url);
-            
-            if(thumbnailFailed){
-              await t1.rollback()
-              return res.status(400).json({error:"Thumbnail was failed"});
-            }
-
-            const insertImagesToDBWithThumbnail = await ProductsImagesModel.create({
-              product_id:insertNewProductToDB.dataValues.id,
-              image_url: result.secure_url,
-              thumbnail_url:uploadedThumbnail.secure_url,
-              alt:validatedNewProduct.alt,
-              isMain:true
-            },{transaction:t1})
-
-            await t1.commit()
-            return res.status(201).json({
-              message: "success",
-              product: validatedNewProduct,
-              thumbnails: insertImagesToDBWithThumbnail
-            });
-          }catch(error){
-            if(passingImageThumbnailToCatchBlock != undefined){
-              await deleteImgFromFileSystem(passingImageThumbnailToCatchBlock.secure_url,process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string)
-            }
-            if(passingImageThumbnailToCatchBlock != undefined){
-              await deleteImgFromFileSystem(result.secure_url,process.env.PRODUCTS_IMAGES_FOLDER_PATH as string)
-            }
-            await t1.rollback();
-            console.log(error);
-            return res.status(500).json({error})
+        validatedNewProduct.image_secure_url = result.secure_url;
+        console.log(insertNewProductToDB);
+        let uploadedThumbnail = await cloudinary.uploader.upload(
+          `data:image/png;base64,${thumbnail}`,
+          {
+            use_filename: true,
+            resource_type: "image",
+            folder: process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
           }
+        );
+
+        passingImageThumbnailToCatchBlock = uploadedThumbnail;
+        console.log(uploadedThumbnail);
+        const { error: thumbnailFailed } = uriImageLinkSchema.validate(
+          uploadedThumbnail.secure_url
+        );
+
+        if (thumbnailFailed) {
+          await t1.rollback();
+          return res.status(400).json({ error: "Thumbnail was failed" });
+        }
+
+        const insertImagesToDBWithThumbnail = await ProductsImagesModel.create(
+          {
+            product_id: insertNewProductToDB.dataValues.id,
+            image_url: result.secure_url,
+            thumbnail_url: uploadedThumbnail.secure_url,
+            alt: validatedNewProduct.alt,
+            isMain: true,
+          },
+          { transaction: t1 }
+        );
+
+        await t1.commit();
+        return res.status(201).json({
+          message: "success",
+          product: validatedNewProduct,
+          thumbnails: insertImagesToDBWithThumbnail,
+        });
+      } catch (error) {
+        if (passingImageThumbnailToCatchBlock != undefined) {
+          await deleteImgFromFileSystem(
+            passingImageThumbnailToCatchBlock.secure_url,
+            process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string
+          );
+        }
+        if (passingImageThumbnailToCatchBlock != undefined) {
+          await deleteImgFromFileSystem(
+            result.secure_url,
+            process.env.PRODUCTS_IMAGES_FOLDER_PATH as string
+          );
+        }
+        await t1.rollback();
+        console.log(error);
+        return res.status(500).json({ error });
+      }
     })();
   } catch (error) {
-    if(fullPictureImagePasser != undefined){
-      await deleteImgFromFileSystem(fullPictureImagePasser.secure_url,process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string)
+    if (fullPictureImagePasser != undefined) {
+      await deleteImgFromFileSystem(
+        fullPictureImagePasser.secure_url,
+        process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string
+      );
     }
     console.log(error);
     return res.status(500).json({ error });
@@ -290,8 +332,8 @@ export const createProduct = async (req: Request, res: Response) => {
 
 // * Update Products ===================================================================
 export const updateProduct = async (req: Request, res: Response) => {
-  let thumbnailPasser : any;
-  let fullImagePasser : any;
+  let thumbnailPasser: any;
+  let fullImagePasser: any;
   try {
     const newProduct = req.body;
     const id = Number(req.params.id);
@@ -299,7 +341,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     const { error: errorProduct, value: validatedNewProduct } =
       productValidatorForUpdate.validate(newProduct);
     if (errorProduct) {
-      console.log(errorProduct)
+      console.log(errorProduct);
       return res.status(400).json({ errorProduct });
     }
 
@@ -307,144 +349,185 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.sendStatus(400);
     }
 
-    let updatedProduct : any= {};
-    validatedNewProduct.name ? updatedProduct['name'] =validatedNewProduct.name : null;
-    validatedNewProduct.category ? updatedProduct['category'] = validatedNewProduct.category : null;
-    validatedNewProduct.price ? updatedProduct['price'] =validatedNewProduct.price : null;
-    validatedNewProduct.description ? updatedProduct['description'] =validatedNewProduct.description : null;
-    validatedNewProduct.finalPrice ? updatedProduct['finalPrice'] =validatedNewProduct.finalPrice : null;
-    validatedNewProduct.Category__Id ? updatedProduct['Category__Id'] =validatedNewProduct.Category__Id : null;
-    validatedNewProduct.offer ? updatedProduct['offer'] =validatedNewProduct.offer : null;
-    validatedNewProduct.alt ? updatedProduct['alt'] =validatedNewProduct.alt : null;
-    validatedNewProduct.quantity ? updatedProduct['quantity'] =validatedNewProduct.quantity : null;
-    validatedNewProduct.imageUrl ? updatedProduct['image_secure_url'] =validatedNewProduct.imageUrl : null;
+    let updatedProduct: any = {};
+    validatedNewProduct.name
+      ? (updatedProduct["name"] = validatedNewProduct.name)
+      : null;
+    validatedNewProduct.category
+      ? (updatedProduct["category"] = validatedNewProduct.category)
+      : null;
+    validatedNewProduct.price
+      ? (updatedProduct["price"] = validatedNewProduct.price)
+      : null;
+    validatedNewProduct.description
+      ? (updatedProduct["description"] = validatedNewProduct.description)
+      : null;
+    validatedNewProduct.finalPrice
+      ? (updatedProduct["finalPrice"] = validatedNewProduct.finalPrice)
+      : null;
+    validatedNewProduct.Category__Id
+      ? (updatedProduct["Category__Id"] = validatedNewProduct.Category__Id)
+      : null;
+    validatedNewProduct.offer
+      ? (updatedProduct["offer"] = validatedNewProduct.offer)
+      : null;
+    validatedNewProduct.alt
+      ? (updatedProduct["alt"] = validatedNewProduct.alt)
+      : null;
+    validatedNewProduct.quantity
+      ? (updatedProduct["quantity"] = validatedNewProduct.quantity)
+      : null;
+    validatedNewProduct.imageUrl
+      ? (updatedProduct["image_secure_url"] = validatedNewProduct.imageUrl)
+      : null;
 
-    let url : string = req.body.imageUrl
+    let url: string = req.body.imageUrl;
     // * if(url) will be for cases when we have images sent to be updated
-    // * url is an image to delete by default all products assumed to have an image, 
+    // * url is an image to delete by default all products assumed to have an image,
     //* so if he does not send an image to be replaced we assume that this person wants to update the normal info
 
-    if(url){
-      const { error : invalidImage } = uriImageLinkSchema.validate(url);
-      if(invalidImage){
-          return res.status(400).json({error:"Invalid image"});
+    if (url) {
+      const { error: invalidImage } = uriImageLinkSchema.validate(url);
+      if (invalidImage) {
+        return res.status(400).json({ error: "Invalid image" });
       }
       let splitted = url.split("/");
-      let imgWithExt = splitted[splitted.length - 1]
-      let img = imgWithExt.split(".")[0]
-      console.log(img,"img");
+      let imgWithExt = splitted[splitted.length - 1];
+      let img = imgWithExt.split(".")[0];
+      console.log(img, "img");
 
-      const productToBeChangedIfItExist : any = await ProductsModel.findOne({
-        where:{
-          id:id,
-          image_secure_url:url
-        }
-      })
+      const productToBeChangedIfItExist: any = await ProductsModel.findOne({
+        where: {
+          id: id,
+          image_secure_url: url,
+        },
+      });
 
-      if(productToBeChangedIfItExist == null){
-        return res.status(400).json({error:"Product or image does not exist"})
+      if (productToBeChangedIfItExist == null) {
+        return res
+          .status(400)
+          .json({ error: "Product or image does not exist" });
       }
 
       let deletedImg = await cloudinary.api.delete_resources(
         [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
-        { type: 'upload', resource_type: 'image' }
+        { type: "upload", resource_type: "image" }
       );
       console.log(deletedImg);
-    
-     
-      const imageFile = req.file;
-      console.log(imageFile)
-      if(imageFile?.fieldname != "image" || imageFile == undefined){
-        return res.status(400).json({error:"missing image or invalid giving name"})
-      }
-      const { buffer } : any = imageFile;
-      let base64Image = buffer.toString('base64')
-      let UploadedImage : any;
 
-      let t2 : Transaction = await sequelize.transaction();
+      const imageFile = req.file;
+      console.log(imageFile);
+      if (imageFile?.fieldname != "image" || imageFile == undefined) {
+        return res
+          .status(400)
+          .json({ error: "missing image or invalid giving name" });
+      }
+      const { buffer }: any = imageFile;
+      let base64Image = buffer.toString("base64");
+      let UploadedImage: any;
+
+      let t2: Transaction = await sequelize.transaction();
       await (async function run() {
-        const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
-          use_filename: true,
-          resource_type:"image",
-          folder:process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH,
-          transformation:[{width:1400,height:1400,crop:"fit"}]
-        });
+        const result = await cloudinary.uploader.upload(
+          `data:image/png;base64,${base64Image}`,
+          {
+            use_filename: true,
+            resource_type: "image",
+            folder: process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH,
+            transformation: [{ width: 1400, height: 1400, crop: "fit" }],
+          }
+        );
         UploadedImage = result;
         fullImagePasser = result;
-        const updateImage : any = await ProductsImagesModel.update({
-          image_url:result.secure_url
-          },{
-            where:{
-                id:id,
-            },transaction:t2
-        })
-        
-      })();
-      
-      let thumbnail = await imageThumbnail(`${base64Image}`,thumbnailOptions);
-      
-      let uploadedThumbnail = await cloudinary.uploader.upload(`data:image/png;base64,${thumbnail}`,{
-        use_filename: true,
-        resource_type:"image",
-        folder:process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
-      })
-      console.log(uploadedThumbnail);
-      const {error : thumbnailFailed} = uriImageLinkSchema.validate(uploadedThumbnail.secure_url);
-      if(thumbnailFailed){
-        return res.status(400).json({error:"Thumbnail was failed"});
-      }
-      console.log(UploadedImage.secure_url,"UploadedImage")
-
-
-      
-      
-      try{
-        const updateImages = await ProductsImagesModel.update({
-          image_url:UploadedImage.secure_url,
-          thumbnail_url:uploadedThumbnail.secure_url
-        },{
-          where:{
-            product_id:id
-          },transaction:t2
-        })
-        console.log(updatedProduct)
-        console.log(updateImages,"updatedImages")
-        const updateNewProductInDB = await ProductsModel.update(
+        const updateImage: any = await ProductsImagesModel.update(
           {
-            ...updatedProduct
+            image_url: result.secure_url,
           },
           {
             where: {
               id: id,
             },
-            transaction:t2
-          },
+            transaction: t2,
+          }
         );
-      }catch(error){
-        if(fullImagePasser != undefined){
-          await deleteImgFromFileSystem(fullImagePasser.secure_url,process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH as string);
+      })();
+
+      let thumbnail = await imageThumbnail(`${base64Image}`, thumbnailOptions);
+
+      let uploadedThumbnail = await cloudinary.uploader.upload(
+        `data:image/png;base64,${thumbnail}`,
+        {
+          use_filename: true,
+          resource_type: "image",
+          folder: process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
         }
-        if(thumbnailPasser != undefined){
-          await deleteImgFromFileSystem(fullImagePasser.secure_url,process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string);
+      );
+      console.log(uploadedThumbnail);
+      const { error: thumbnailFailed } = uriImageLinkSchema.validate(
+        uploadedThumbnail.secure_url
+      );
+      if (thumbnailFailed) {
+        return res.status(400).json({ error: "Thumbnail was failed" });
+      }
+      console.log(UploadedImage.secure_url, "UploadedImage");
+
+      try {
+        const updateImages = await ProductsImagesModel.update(
+          {
+            image_url: UploadedImage.secure_url,
+            thumbnail_url: uploadedThumbnail.secure_url,
+          },
+          {
+            where: {
+              product_id: id,
+            },
+            transaction: t2,
+          }
+        );
+        console.log(updatedProduct);
+        console.log(updateImages, "updatedImages");
+        const updateNewProductInDB = await ProductsModel.update(
+          {
+            ...updatedProduct,
+          },
+          {
+            where: {
+              id: id,
+            },
+            transaction: t2,
+          }
+        );
+      } catch (error) {
+        if (fullImagePasser != undefined) {
+          await deleteImgFromFileSystem(
+            fullImagePasser.secure_url,
+            process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH as string
+          );
+        }
+        if (thumbnailPasser != undefined) {
+          await deleteImgFromFileSystem(
+            fullImagePasser.secure_url,
+            process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string
+          );
         }
         console.log(error);
-        await t2.rollback()
-        return res.status(400).json({error});
+        await t2.rollback();
+        return res.status(400).json({ error });
       }
 
-      await t2.commit()
-    }else{
+      await t2.commit();
+    } else {
       // * In case was sent by the admin this case here deals with update with no images
       updatedProduct.image_secure_url = undefined;
       const updateNewProductInDB = await ProductsModel.update(
         {
-          ...updatedProduct
+          ...updatedProduct,
         },
         {
           where: {
             id: id,
           },
-        },
+        }
       );
     }
     return res.status(201).json({
@@ -452,11 +535,17 @@ export const updateProduct = async (req: Request, res: Response) => {
       newProduct: updatedProduct,
     });
   } catch (error) {
-    if(fullImagePasser != undefined){
-      await deleteImgFromFileSystem(fullImagePasser.secure_url,process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH as string);
+    if (fullImagePasser != undefined) {
+      await deleteImgFromFileSystem(
+        fullImagePasser.secure_url,
+        process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH as string
+      );
     }
-    if(thumbnailPasser != undefined){
-      await deleteImgFromFileSystem(thumbnailPasser.secure_url,process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string);
+    if (thumbnailPasser != undefined) {
+      await deleteImgFromFileSystem(
+        thumbnailPasser.secure_url,
+        process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH as string
+      );
     }
     return res.status(500).json({ error });
   }
@@ -465,43 +554,44 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
-    const image : string = req.body.imageUrl;
+    const image: string = req.body.imageUrl;
 
     if (Number.isNaN(id)) {
       return res.sendStatus(400);
     }
-    let deleteProduct,deleteProductsImages;
-    let t3 : Transaction = await sequelize.transaction()
-    try{
+    let deleteProduct, deleteProductsImages;
+    let t3: Transaction = await sequelize.transaction();
+    try {
       deleteProduct = await ProductsModel.destroy({
         where: {
           id: id,
-        },transaction:t3
+        },
+        transaction: t3,
       });
 
       deleteProductsImages = await ProductsImagesModel.destroy({
-        where:{
-          product_id:id
-        },transaction:t3
-      })
-      await t3.commit()
-    }catch(error){
-      await t3.rollback()
+        where: {
+          product_id: id,
+        },
+        transaction: t3,
+      });
+      await t3.commit();
+    } catch (error) {
+      await t3.rollback();
       console.log(error);
-      return res.status(400).json({error})
+      return res.status(400).json({ error });
     }
-    
 
     let splitted = image.split("/");
-    let imgWithExt = splitted[splitted.length - 1]
-    let img = imgWithExt.split(".")[0]
-    console.log(img,"img");
+    let imgWithExt = splitted[splitted.length - 1];
+    let img = imgWithExt.split(".")[0];
+    console.log(img, "img");
 
     let deletedImg = await cloudinary.api.delete_resources(
       [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
-      { type: 'upload', resource_type: 'image' }
+      { type: "upload", resource_type: "image" }
     );
-    
+
     if (deleteProduct && deleteProductsImages) {
       return res.status(202).json({ message: "success" });
     } else {

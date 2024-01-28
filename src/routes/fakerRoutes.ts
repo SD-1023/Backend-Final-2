@@ -10,7 +10,6 @@ import {
   filingTablesWishLists,
   fillingTablesAddresses,
   fillingTablesCart,
-  
 } from "../utils/faker";
 import { ProductsModel } from "../models/products";
 import { ReviewsModel } from "../models/reviews";

@@ -1,4 +1,8 @@
-import { fillingTablesCart, fillingTablesOrders, fillingTablesWithOrdersItems } from './../utils/faker';
+import {
+  fillingTablesCart,
+  fillingTablesOrders,
+  fillingTablesWithOrdersItems,
+} from "./../utils/faker";
 import { DataTypes } from "sequelize";
 import dotenv from "dotenv";
 import { sequelize } from "../config/database";
@@ -47,12 +51,10 @@ export const ProductsModel = sequelize.define("products", {
     allowNull: true,
   },
   image_secure_url: {
-    type: DataTypes.STRING(128),
+    type: DataTypes.STRING(255),
     allowNull: true,
   },
 });
-
-
 
 // const fillingTablesOrders_ = async () =>{
 //   await OrdersModel.sync({force:true});
