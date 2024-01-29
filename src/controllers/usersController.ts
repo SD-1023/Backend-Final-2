@@ -98,7 +98,7 @@ export const signUp = async (req: Request, res: Response) => {
 
     const sessionId = uuidv4();
 
-    const sessionData = await SessionsModel.create({
+    await SessionsModel.create({
       sid: sessionId,
       userId: newUser.id,
     });
@@ -139,7 +139,6 @@ export const signIn = async (req: Request, res: Response) => {
     });
 
     const userdata = {
-      sessionId,
       userId: user.id,
       email: user.email,
       username: user.username,
@@ -148,7 +147,7 @@ export const signIn = async (req: Request, res: Response) => {
       updatedAt: user.updatedAt,
     };
 
-    res.json({ message: "success", userdata });
+    res.json({ message: "success", sessionId, userdata });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
