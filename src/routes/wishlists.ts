@@ -4,7 +4,7 @@ import { authenticate } from "../middlewares/authenticate";
 
 const router = express.Router();
 
-router.get("/:id", wishlistsController.getAllWishlistsByUserId);
+router.get("/:id", authenticate, wishlistsController.getAllWishlistsByUserId);
 router.post("/", authenticate, wishlistsController.addToWishList);
 router.delete("/:id", authenticate, wishlistsController.deleteFromWishList);
 router.delete("/clear/:id", authenticate, wishlistsController.clearWishList);

@@ -11,7 +11,7 @@ import cartRoutes from "./routes/cart";
 import ordersRoutes from "./routes/orders";
 import addressesRoutes from "./routes/addresses";
 import productsImagesRoutes from "./routes/productsImagesRoutes";
-import "./models/associations"
+import "./models/associations";
 import FakerRoute from "./routes/fakerRoutes";
 import { ProductsModel } from "./models/products";
 import { ReviewsModel } from "./models/reviews";
@@ -25,6 +25,7 @@ import cors from "cors";
 import { sequelize } from "./config/database";
 import brandsRoutes from "./routes/brands";
 import fakerRoutes from "./routes/fakerRoutes";
+import { SessionCleanup } from "./utils/sessionCleanup";
 
 const app = express();
 dotenv.config();
@@ -47,3 +48,5 @@ const PORT = process.env.PORT;
 app.listen(PORT, () =>
   console.log(`Server is running in development mode on PORT : ${PORT}`)
 );
+
+SessionCleanup();

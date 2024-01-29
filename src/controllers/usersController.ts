@@ -133,17 +133,22 @@ export const signIn = async (req: Request, res: Response) => {
 
     const sessionId = uuidv4();
 
-    const sessionData = await SessionsModel.create({
+    await SessionsModel.create({
       sid: sessionId,
       userId: user.id,
     });
 
-    const result = {
+    const userdata = {
       sessionId,
       userId: user.id,
+      email: user.email,
       username: user.username,
+      image: user.user_image,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
-    res.json({ message: "success", result });
+
+    res.json({ message: "success", userdata });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

@@ -4,6 +4,8 @@ export type User = {
   email: string;
   password: string;
   user_image: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type Session = {

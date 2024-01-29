@@ -4,7 +4,7 @@ import { authenticate } from "../middlewares/authenticate";
 
 const router = express.Router();
 
-router.get("/:id", cartController.getCartByUserId);
+router.get("/:id", authenticate, cartController.getCartByUserId);
 router.post("/", authenticate, cartController.addToCart);
 router.delete("/", authenticate, cartController.deleteFromCart);
 router.delete("/clear/:id", authenticate, cartController.clearCart);
