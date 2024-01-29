@@ -7,7 +7,6 @@ export const SessionsModel = sequelize.define(
     sid: { type: DataTypes.STRING(36), primaryKey: true },
   },
   {
-    timestamps: false,
+    timestamps: true,
   }
 );
-
