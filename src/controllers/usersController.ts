@@ -103,7 +103,7 @@ export const signUp = async (req: Request, res: Response) => {
       userId: newUser.id,
     });
 
-    res.json({ newUser, sessionId });
+    res.json({ message: "success", newUser, sessionId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error2" });
