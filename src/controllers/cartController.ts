@@ -101,7 +101,7 @@ export const deleteFromCart = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Failed deleting process" });
     }
 
-    return res.status(200).json({ message: "success" });
+    return res.status(200).json({ message: "success", productId });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });
