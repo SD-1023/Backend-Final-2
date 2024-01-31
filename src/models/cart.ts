@@ -16,6 +16,10 @@ export const CartsModel = sequelize.define('cart', {
     type:DataTypes.INTEGER,
     allowNull:false,
   },
+  offer: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: false,
+  },
   product_price: {
     type:DataTypes.DECIMAL(10,0),
     allowNull:false

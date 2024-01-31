@@ -34,4 +34,5 @@ AddressModel.belongsTo(UsersModel, { foreignKey: "user_id", as: "user" });
 UsersModel.hasMany(AddressModel, { foreignKey: "user_id", as: "addresses" });
 SessionsModel.belongsTo(UsersModel, { foreignKey: "userId" });
 
-sequelize.sync({ alter: true });
+//SessionsModel.sync({force:true});
+//sequelize.sync({ alter: true });
