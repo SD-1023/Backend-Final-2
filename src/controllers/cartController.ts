@@ -19,12 +19,6 @@ export const getCartByUserId = async (req: Request, res: Response) => {
       where: { user_id: userId },
     });
 
-    if (cart.length === 0) {
-      return res
-        .status(200)
-        .json({ error: "No cart entries found for the specified user ID" });
-    }
-
     return res.status(200).json({ message: "success", cartItems: cart });
   } catch (error) {
     console.error(error);
@@ -62,6 +56,7 @@ export const addToCart = async (req: Request, res: Response) => {
       product_name: product.dataValues.name,
       finalPrice: Number(product.dataValues.finalPrice),
       quantity,
+      offer:product.dataValues.offer,
       product_price: Number(product.dataValues.price),
       image_secure_url: product.dataValues.image_secure_url,
     });
