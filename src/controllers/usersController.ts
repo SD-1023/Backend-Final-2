@@ -103,7 +103,7 @@ export const signUp = async (req: Request, res: Response) => {
       userId: newUser.id,
     });
 
-    res.json({ message: "success", newUser, sessionId });
+    res.json({ message:"success",newUser, sessionId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error2" });
@@ -147,7 +147,7 @@ export const signIn = async (req: Request, res: Response) => {
       updatedAt: user.updatedAt,
     };
 
-    res.json({ message: "success", sessionId, userdata });
+    res.json({ message: "success", userdata, sessionId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
