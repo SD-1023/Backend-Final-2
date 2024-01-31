@@ -1,3 +1,4 @@
+import { ProductsModel } from './../models/products';
 import { Request, Response } from "express";
 import { WishlistsModel } from "../models/wishlist";
 import { wishListSchema } from "../validators/validations";
@@ -10,9 +11,15 @@ export const getAllWishlistsByUserId = async (req: Request, res: Response) => {
     }
 
     const userWishList = await WishlistsModel.findAll({
+      attributes:{
+        exclude:["product_id"]
+      },
       where: {
         user_id: id,
       },
+      include:{
+        model:ProductsModel
+      }
     });
 
     return res
