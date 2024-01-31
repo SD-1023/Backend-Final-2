@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import { SessionsModel } from "../models/sessions";
 
 export const SessionCleanup = () => {
-  cron.schedule("*/30 * * * *", async () => {
+  cron.schedule("*/35 * * * *", async () => {
     try {
       const twentyFourHoursAgo = new Date();
       twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
