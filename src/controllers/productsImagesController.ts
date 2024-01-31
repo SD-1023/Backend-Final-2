@@ -33,7 +33,7 @@ export const createProductImages = async (req :Request,res:Response)=>{
         }
         const alt = req.body.alt;
         const isMain = req.body.isMain;
-        console.log(isMain)
+        //console.log(isMain)
         if(isMain != "false" && isMain != "true"){
             return res.status(400).json({error:"isMain is required"})
         }
@@ -128,13 +128,13 @@ export const updateProductImage = async (req: Request,res:Response) =>{
         let splitted = url.split("/");
         let imgWithExt = splitted[splitted.length - 1]
         let img = imgWithExt.split(".")[0]
-        console.log(img,"img")
+        //console.log(img,"img")
 
         let deletedImg = await cloudinary.api.delete_resources(
             [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
             { type: 'upload', resource_type: 'image' }
         )
-        console.log(deletedImg);
+        //console.log(deletedImg);
 
         let UploadedImage : any = await cloudinary.uploader.upload(`data:image/png;base64,${base64Image}`,{
             use_filename: true,
