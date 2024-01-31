@@ -127,7 +127,7 @@ export const addOrder = async(req: Request,res: Response)=>{
                 user_id:id
             }
         })
-
+        
         if(cartItems.length == 0 ){
             return res.status(400).json({error:"You cant order an empty cart"});
         }
@@ -205,6 +205,18 @@ export const addOrder = async(req: Request,res: Response)=>{
                 ordersList.push(newOrderItems);
             }
 
+            const deleteCartItems = await CartsModel.destroy({
+                where:{
+                    user_id:id
+
+                },transaction:createTransaction
+            })
+
+            if(deleteCartItems != cartItems.length){
+                await createTransaction.rollback();
+                return res.status(400).json({error:"Cart items were not all deleted, process terminated"});
+            }
+
             if(ordersList.length == 0 ){
                 await createTransaction.rollback();
                 return res.status(400).json({error:"Order items were not created"});
@@ -212,7 +224,7 @@ export const addOrder = async(req: Request,res: Response)=>{
 
 
         newOrder.dataValues.ordersItems = [...ordersList];
-            console.log(ordersList);
+            
         await createTransaction.commit();
         return res.status(201).json({message:"success",order:newOrder});
     }catch(error){

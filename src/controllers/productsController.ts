@@ -262,7 +262,7 @@ export const createProduct = async (req: Request, res: Response) => {
         );
 
         validatedNewProduct.image_secure_url = result.secure_url;
-        console.log(insertNewProductToDB);
+        //console.log(insertNewProductToDB);
         let uploadedThumbnail = await cloudinary.uploader.upload(
           `data:image/png;base64,${thumbnail}`,
           {
@@ -273,7 +273,7 @@ export const createProduct = async (req: Request, res: Response) => {
         );
 
         passingImageThumbnailToCatchBlock = uploadedThumbnail;
-        console.log(uploadedThumbnail);
+        //console.log(uploadedThumbnail);
         const { error: thumbnailFailed } = uriImageLinkSchema.validate(
           uploadedThumbnail.secure_url
         );
@@ -394,7 +394,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       let splitted = url.split("/");
       let imgWithExt = splitted[splitted.length - 1];
       let img = imgWithExt.split(".")[0];
-      console.log(img, "img");
+      //console.log(img, "img");
 
       const productToBeChangedIfItExist: any = await ProductsModel.findOne({
         where: {
@@ -413,10 +413,10 @@ export const updateProduct = async (req: Request, res: Response) => {
         [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],
         { type: "upload", resource_type: "image" }
       );
-      console.log(deletedImg);
+      //console.log(deletedImg);
 
       const imageFile = req.file;
-      console.log(imageFile);
+      //console.log(imageFile);
       if (imageFile?.fieldname != "image" || imageFile == undefined) {
         return res
           .status(400)
@@ -462,14 +462,14 @@ export const updateProduct = async (req: Request, res: Response) => {
           folder: process.env.PRODUCTSTHUMBNAIL_IMAGES_FOLDER_PATH,
         }
       );
-      console.log(uploadedThumbnail);
+      //console.log(uploadedThumbnail);
       const { error: thumbnailFailed } = uriImageLinkSchema.validate(
         uploadedThumbnail.secure_url
       );
       if (thumbnailFailed) {
         return res.status(400).json({ error: "Thumbnail was failed" });
       }
-      console.log(UploadedImage.secure_url, "UploadedImage");
+      //console.log(UploadedImage.secure_url, "UploadedImage");
 
       try {
         const updateImages = await ProductsImagesModel.update(
@@ -484,8 +484,8 @@ export const updateProduct = async (req: Request, res: Response) => {
             transaction: t2,
           }
         );
-        console.log(updatedProduct);
-        console.log(updateImages, "updatedImages");
+        //console.log(updatedProduct);
+        //console.log(updateImages, "updatedImages");
         const updateNewProductInDB = await ProductsModel.update(
           {
             ...updatedProduct,
@@ -585,7 +585,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
     let splitted = image.split("/");
     let imgWithExt = splitted[splitted.length - 1];
     let img = imgWithExt.split(".")[0];
-    console.log(img, "img");
+    //console.log(img, "img");
 
     let deletedImg = await cloudinary.api.delete_resources(
       [`${process.env.PRODUCTSIMAGESCOLLECTION_IMAGES_FOLDER_PATH}/${img}`],

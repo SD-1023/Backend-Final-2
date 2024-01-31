@@ -34,7 +34,6 @@ export const getAllWishlistsByUserId = async (req: Request, res: Response) => {
 export const addToWishList = async (req: Request, res: Response) => {
   try {
     const newWishList = req.body;
-    console.log(newWishList);
 
     const { error } = wishListSchema.validate(newWishList);
     if (error) {
@@ -82,7 +81,7 @@ export const clearWishList = async (req :Request,res: Response)=>{
     try{
 
         const id = Number(req.params.id);
-        console.log(id)
+        
         if (Number.isNaN(id)) {
           return res.sendStatus(400);
         }
