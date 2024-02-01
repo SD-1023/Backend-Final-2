@@ -39,6 +39,19 @@ export const addToWishList = async (req: Request, res: Response) => {
     if (error) {
       return res.status(400).json(error);
     }
+
+    // Try to avoid doing this query by forcing it by the associations
+    const userWishList = await WishlistsModel.findOne({
+      where:{
+        product_id:newWishList.productId,
+        user_id:newWishList.userId
+      }
+    })
+
+    if(userWishList){
+      return res.status(400).json({error:"Item already exist"});
+    }
+
     const AddNewWishList = await WishlistsModel.create({
       user_id: newWishList.userId,
       product_id: newWishList.productId,

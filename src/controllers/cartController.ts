@@ -1,3 +1,4 @@
+import { UsersModel } from './../models/users';
 import { Request, Response } from "express";
 import { CartsModel } from "../models/cart";
 import { ProductsModel } from "../models/products";

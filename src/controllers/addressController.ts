@@ -41,6 +41,8 @@ export const createNewAddress = async (req: Request, res: Response) => {
       const newAddress = await AddressModel.create({
         user_id:newAddressInfo.userId,
         Full__Name:newAddressInfo.FullName,
+        country_calling_code:newAddressInfo.countryCallingCode,
+        mobile_number:newAddressInfo.mobile_number,
         ...newAddressInfo
       });
   
@@ -69,12 +71,12 @@ export const updateAddress = async (req: Request, res: Response) => {
 
     let updatingUser :any = await existingAddress.update({
       Full__Name:updatingInfo.newFullName,
-      countyCallingCode:updatingInfo.newCountryCallingCode,
+      country_calling_code:updatingInfo.newCountryCallingCode,
       state:updatingInfo.newState,
       city:updatingInfo.newCity,
       country:updatingInfo.newCountry,
       postalCode:updatingInfo.newPostalCode,
-      mobile__number:updatingInfo.newMobileNumber,
+      mobile_number:updatingInfo.newMobileNumber,
       street:updatingInfo.newStreet
     });
     

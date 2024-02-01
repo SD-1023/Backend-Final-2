@@ -27,6 +27,10 @@ export const getOrdersByUserId = async (req : Request,res : Response)=>{
                 },
                 {
                     model:OrdersItemsModel,
+                    include:[{
+                        model:ProductsModel,
+                    }],
+                    attributes:{exclude:["product_id"]}
                 }
             ],
             where:{
@@ -51,6 +55,10 @@ export const getAllCancelledOrdersByUserId = async (req: Request, res: Response)
         const cancelledOrders = await OrdersModel.findAll({
             include:{
                 model:OrdersItemsModel,
+                include:[{
+                    model:ProductsModel,
+                }],
+                attributes:{exclude:["product_id"]}
             },
             where:{
                 user_Id:id,
@@ -75,6 +83,10 @@ export const getAllCompletedOrdersByUserId = async (req: Request, res: Response)
         const completedOrders = await OrdersModel.findAll({
             include:{
                 model:OrdersItemsModel,
+                include:[{
+                    model:ProductsModel,
+                }],
+                attributes:{exclude:["product_id"]}
             },
             where:{
                 user_Id:id,
@@ -99,6 +111,10 @@ export const getAllPendingOrdersByUserId = async (req: Request, res: Response) =
         const completedOrders = await OrdersModel.findAll({
             include:{
                 model:OrdersItemsModel,
+                include:[{
+                    model:ProductsModel,
+                }],
+                attributes:{exclude:["product_id"]}
             },
             where:{
                 user_Id:id,

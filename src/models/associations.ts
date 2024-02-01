@@ -1,3 +1,4 @@
+import { CartsModel } from './cart';
 import { sequelize } from "../config/database";
 import { AddressModel } from "./address";
 import { CategoriesModel } from "./categories";
@@ -33,8 +34,14 @@ OrdersModel.hasMany(OrdersItemsModel, { foreignKey: "order_Id" });
 
 AddressModel.belongsTo(UsersModel, { foreignKey: "user_id", as: "user" });
 UsersModel.hasMany(AddressModel, { foreignKey: "user_id", as: "addresses" });
-SessionsModel.belongsTo(UsersModel, { foreignKey: "userId" });
 
+UsersModel.hasMany(CartsModel,{foreignKey:"user_id"})
+CartsModel.belongsTo(UsersModel,{foreignKey:"user_id"});
+
+ProductsModel.hasMany(OrdersItemsModel,{foreignKey:"id"})
+OrdersItemsModel.belongsTo(ProductsModel,{foreignKey:"product_id"})
+
+SessionsModel.belongsTo(UsersModel, { foreignKey: "userId" });
 WishlistsModel.belongsTo(ProductsModel,{foreignKey: "product_id"});
 
 
